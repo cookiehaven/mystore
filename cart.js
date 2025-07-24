@@ -45,8 +45,9 @@ function renderCart() {
   const total = items.reduce((sum, item) => sum + item.price * item.qty, 0);
 
   container.innerHTML = items.map(item => `
-    <div class="cart-item" style="margin-bottom: 10px;">
-      <span>${item.name}</span>
+    <div class="cart-item" style="display:flex; align-items:center; margin-bottom: 10px; gap: 10px;">
+      <img src="${item.image}" alt="${item.name}" style="width:60px; height:auto; border-radius:5px;"/>
+      <span style="flex:1;">${item.name}</span>
       <button style="margin: 0 5px;" onclick="updateQty(${item.id}, -1)">➖</button>
       <span>${item.qty}</span>
       <button style="margin: 0 5px;" onclick="updateQty(${item.id}, 1)">➕</button>
