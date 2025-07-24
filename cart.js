@@ -42,20 +42,19 @@ function renderCart() {
     return;
   }
 
-  // محاسبه جمع کل
   const total = items.reduce((sum, item) => sum + item.price * item.qty, 0);
 
   container.innerHTML = items.map(item => `
-    <div class="cart-item">
+    <div class="cart-item" style="margin-bottom: 10px;">
       <span>${item.name}</span>
-      <button onclick="updateQty(${item.id}, -1)">➖</button>
+      <button style="margin: 0 5px;" onclick="updateQty(${item.id}, -1)">➖</button>
       <span>${item.qty}</span>
-      <button onclick="updateQty(${item.id}, 1)">➕</button>
-      <span> - ${item.price.toLocaleString()} تومان</span>
+      <button style="margin: 0 5px;" onclick="updateQty(${item.id}, 1)">➕</button>
+      <span> - ${(item.price * item.qty).toLocaleString()} تومان</span>
     </div>
   `).join("");
 
-  container.innerHTML += `<hr><div>جمع کل: ${total.toLocaleString()} تومان</div>`;
+  container.innerHTML += `<hr><div><strong>جمع کل: ${total.toLocaleString()} تومان</strong></div>`;
 }
 
 renderCart();
