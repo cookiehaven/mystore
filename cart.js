@@ -17,6 +17,19 @@ function addToCart(id) {
   }
   saveCart(cart);
   alert("به سبد خرید اضافه شد!");
+  renderCart();
+}
+
+function updateQty(id, change) {
+  const cart = getCart();
+  const item = cart.find(p => p.id === id);
+  if (!item) return;
+
+  item.qty += change;
+  if (item.qty < 1) item.qty = 1;
+
+  saveCart(cart);
+  renderCart();
 }
 
 function renderCart() {
@@ -24,10 +37,25 @@ function renderCart() {
   const container = document.getElementById("cart-items");
   if (!container) return;
 
+  if (items.length === 0) {
+    container.innerHTML = "<p>سبد خرید شما خالی است.</p>";
+    return;
+  }
+
+  // محاسبه جمع کل
+  const total = items.reduce((sum, item) => sum + item.price * item.qty, 0);
+
   container.innerHTML = items.map(item => `
     <div class="cart-item">
-      ${item.name} × ${item.qty} - ${item.price.toLocaleString()} تومان
+      <span>${item.name}</span>
+      <button onclick="updateQty(${item.id}, -1)">➖</button>
+      <span>${item.qty}</span>
+      <button onclick="updateQty(${item.id}, 1)">➕</button>
+      <span> - ${item.price.toLocaleString()} تومان</span>
     </div>
   `).join("");
+
+  container.innerHTML += `<hr><div>جمع کل: ${total.toLocaleString()} تومان</div>`;
 }
+
 renderCart();
