@@ -10,7 +10,20 @@
   <header>
     <h1>🍪 Cookie Haven</h1>
   </header>
+
+  <!-- 🔍 فیلتر و جست‌وجو -->
+  <section id="filter-search-container">
+    <input type="text" id="search-input" placeholder="جست‌وجو..." onkeyup="searchProducts()" />
+
+    <div id="filter-buttons">
+      <button onclick="filterProducts('all')">همه</button>
+      <button onclick="filterProducts('cookie')">کوکی</button>
+      <button onclick="filterProducts('cheesecake')">چیزکیک</button>
+    </div>
+  </section>
+
   <main id="product-list"></main>
+
   <footer>
     <a href="cart.html">🛒 مشاهده سبد خرید</a>
   </footer>
