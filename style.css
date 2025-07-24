@@ -1,6 +1,6 @@
 body {
   font-family: sans-serif;
-  max-width: 800px;
+  max-width: 1000px;
   margin: auto;
   padding: 1rem;
   direction: rtl;
@@ -10,16 +10,6 @@ body {
 header, footer {
   text-align: center;
   margin: 1rem 0;
-}
-
-header h1 {
-  margin: 0;
-}
-
-footer a {
-  text-decoration: none;
-  color: #d2691e;
-  font-weight: bold;
 }
 
 #filter-search-container {
@@ -60,11 +50,12 @@ footer a {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 1rem;
+  gap: 1.5rem;
+  padding-top: 1rem;
 }
 
 .product {
-  width: 250px;
+  width: 240px;
   background: #fff;
   padding: 1rem;
   border-radius: 10px;
@@ -114,7 +105,6 @@ input, textarea {
   border-radius: 5px;
 }
 
-/* کارت آیتم‌های سبد خرید */
 .cart-item {
   background: #fff;
   padding: 1rem;
