@@ -11,7 +11,15 @@ document.getElementById("order-form")?.addEventListener("submit", function (e) {
     return;
   }
 
-  const message = `🍪 سفارش جدید از Cookie Haven:\n👤 نام: ${name}\n📱 تماس: ${phone}\n🏠 آدرس: ${address}\n🛒 سفارشات:\n${cart.map(i => `- ${i.name} × ${i.qty}`).join("\n")}`;
+  // محاسبه جمع کل
+  const totalPrice = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+
+  // ساخت متن سفارش با قیمت هر محصول
+  const orderLines = cart.map(item =>
+    `- ${item.name} × ${item.qty} = ${ (item.price * item.qty).toLocaleString()} تومان`
+  ).join("\n");
+
+  const message = `🍪 سفارش جدید از Cookie Haven:\n👤 نام: ${name}\n📱 تماس: ${phone}\n🏠 آدرس: ${address}\n🛒 سفارشات:\n${orderLines}\n\n💰 جمع کل: ${totalPrice.toLocaleString()} تومان`;
 
   fetch("https://api.telegram.org/bot8498305203:AAGTSIPm-EqhwXiYqMEGMdaTUCjwcVLE6g0/sendMessage", {
     method: "POST",
