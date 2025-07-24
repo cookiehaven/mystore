@@ -1,62 +1,0 @@
-<!DOCTYPE html>
-<html lang="fa">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>سبد خرید</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <header><h1>🛒 سبد خرید</h1></header>
-
-  <main id="cart-items"></main>
-
-  <section id="checkout">
-    <!-- پنجره پیش نمایش سفارش (modal) -->
-    <div id="order-preview-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
-      <div style="background:#fff; padding:20px; border-radius:8px; max-width:400px; width:90%; direction: rtl; text-align: right;">
-        <h3>پیش‌نمایش سفارش شما</h3>
-        <pre id="order-preview-text" style="white-space: pre-wrap; font-family: monospace;"></pre>
-        <div style="margin-top:15px; text-align:center;">
-          <button id="confirm-order-btn" style="padding: 8px 15px; margin-right: 10px;">تأیید و ادامه پرداخت</button>
-          <button id="cancel-order-btn" style="padding: 8px 15px;">لغو</button>
-        </div>
-      </div>
-    </div>
-
-    <h2>ثبت سفارش</h2>
-    <form id="order-form">
-      <input type="text" id="name" placeholder="نام" required />
-      <input type="text" id="phone" placeholder="شماره تماس" required />
-      <span id="phone-error" style="color: red; font-size: 0.9rem;"></span>
-      <textarea id="address" placeholder="آدرس" required></textarea>
-      <button type="submit">ارسال سفارش</button>
-    </form>
-    <p id="status" style="color: red;"></p>
-  </section>
-
-  <!-- فرم اطلاعات پرداخت، اول مخفی -->
-  <section id="payment-info-section" style="display:none; direction: rtl; text-align: right; margin-top: 20px;">
-  <h3>اطلاعات پرداخت</h3>
-  <p>لطفاً مبلغ واریزی، تاریخ و کد پیگیری تراکنش را وارد کنید.</p>
-  <p style="background:#fffbcc; padding: 10px; border: 1px solid #f0e68c; border-radius: 5px; margin-bottom: 15px;">
-    <strong>شماره کارت:</strong> 6037 1234 5678 9012<br/>
-    <small style="color: #b22222;">برای هربار پرداخت به شماره کارت جدید فقط واریزی انجام بدین لطفا.</small>
-  </p>
-  <form id="payment-form">
-    <input type="text" id="payment-amount" placeholder="مبلغ واریزی (تومان)" required />
-    <input type="text" id="payment-date" placeholder="تاریخ واریز (مثلاً 1402/04/01)" required />
-    <input type="text" id="payment-tracking" placeholder="کد پیگیری تراکنش" required />
-    <button type="submit">ارسال اطلاعات پرداخت</button>
-  </form>
-  <p id="payment-status" style="color: red;"></p>
-  </section>
-
-  <footer>
-    <a href="index.html">🏠 بازگشت به فروشگاه</a>
-  </footer>
-
-  <script src="cart.js"></script>
-  <script src="send-to-telegram.js"></script>
-</body>
-</html>
