@@ -28,7 +28,8 @@ function updateQty(id, change) {
   cart[itemIndex].qty += change;
 
   if (cart[itemIndex].qty < 1) {
-    cart.splice(itemIndex, 1); // حذف محصول از سبد
+    // حذف محصول اگر تعداد به صفر رسید
+    cart.splice(itemIndex, 1);
   }
 
   saveCart(cart);
@@ -47,19 +48,18 @@ function renderCart() {
 
   const total = items.reduce((sum, item) => sum + item.price * item.qty, 0);
 
-  container.innerHTML = items.map(item => {
-    const imgSrc = item.image || "images/default-product.jpg"; // عکس پیش‌فرض
-    return `
-      <div class="cart-item" style="display:flex; align-items:center; margin-bottom: 10px; gap: 10px;">
-        <img src="${imgSrc}" alt="${item.name}" style="width:60px; height:auto; border-radius:5px;"/>
-        <span style="flex:1;">${item.name}</span>
-        <button style="margin: 0 5px;" onclick="updateQty(${item.id}, -1)">➖</button>
+  container.innerHTML = items.map(item => `
+    <div class="cart-item">
+      <img src="${item.image}" alt="${item.name}" />
+      <span style="flex:1;">${item.name}</span>
+      <div>
+        <button onclick="updateQty(${item.id}, -1)">➖</button>
         <span>${item.qty}</span>
-        <button style="margin: 0 5px;" onclick="updateQty(${item.id}, 1)">➕</button>
-        <span> - ${(item.price * item.qty).toLocaleString()} تومان</span>
+        <button onclick="updateQty(${item.id}, 1)">➕</button>
       </div>
-    `;
-  }).join("");
+      <span>${(item.price * item.qty).toLocaleString()} تومان</span>
+    </div>
+  `).join("");
 
   container.innerHTML += `<hr><div><strong>جمع کل: ${total.toLocaleString()} تومان</strong></div>`;
 }
