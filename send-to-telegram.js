@@ -8,13 +8,6 @@ const orderPreviewText = document.getElementById("order-preview-text");
 const confirmOrderBtn = document.getElementById("confirm-order-btn");
 const cancelOrderBtn = document.getElementById("cancel-order-btn");
 
-const paymentInfoSection = document.getElementById("payment-info-section");
-const paymentForm = document.getElementById("payment-form");
-const paymentAmount = document.getElementById("payment-amount");
-const paymentDate = document.getElementById("payment-date");
-const paymentTracking = document.getElementById("payment-tracking");
-const paymentStatus = document.getElementById("payment-status");
-
 const phoneRegex = /^09\d{9}$/;
 
 // اعتبارسنجی لحظه‌ای شماره موبایل
@@ -72,94 +65,43 @@ ${orderLines}
   // نمایش پنجره پیش‌نمایش
   orderPreviewText.textContent = previewMessage;
   orderPreviewModal.style.display = "flex";
-  paymentInfoSection.style.display = "none";
-  statusText.innerText = "";
 
-  // وقتی کاربر سفارش را تایید کرد، فرم پرداخت نمایش داده شود و پیش‌نمایش بسته شود
-  confirmOrderBtn.onclick = () => {
-    orderPreviewModal.style.display = "none";
-    paymentInfoSection.style.display = "block";
+  // تابع ارسال سفارش
+  const sendOrder = () => {
+    fetch("https://api.telegram.org/bot8498305203:AAGTSIPm-EqhwXiYqMEGMdaTUCjwcVLE6g0/sendMessage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: "64410546",
+        text: previewMessage
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.ok) {
+        statusText.innerText = "✅ سفارش شما با موفقیت ارسال شد!";
+        localStorage.removeItem("cart");
+        orderForm.reset();
+      } else {
+        statusText.innerText = "❌ ارسال سفارش با خطا مواجه شد.";
+        console.error("Telegram API error:", data);
+      }
+    })
+    .catch(err => {
+      statusText.innerText = "❌ خطا در اتصال به سرور تلگرام.";
+      console.error("Fetch error:", err);
+    })
+    .finally(() => {
+      orderPreviewModal.style.display = "none";
+      confirmOrderBtn.removeEventListener("click", sendOrder);
+    });
   };
 
-  // لغو سفارش
+  // تنظیم دکمه‌ها
+  confirmOrderBtn.onclick = sendOrder;
   cancelOrderBtn.onclick = () => {
     orderPreviewModal.style.display = "none";
     statusText.innerText = "❌ ارسال سفارش لغو شد.";
     confirmOrderBtn.onclick = null;
-    paymentInfoSection.style.display = "none";
   };
-});
-
-// ارسال اطلاعات پرداخت
-paymentForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  const amount = paymentAmount.value.trim();
-  const date = paymentDate.value.trim();
-  const tracking = paymentTracking.value.trim();
-
-  if (!amount || !date || !tracking) {
-    paymentStatus.innerText = "لطفاً تمام فیلدهای اطلاعات پرداخت را پر کنید.";
-    return;
-  }
-
-  // حالا پیام کامل شامل سفارش + اطلاعات پرداخت ساخته می‌شود
-  const name = document.getElementById("name").value.trim();
-  const phone = phoneInput.value.trim();
-  const address = document.getElementById("address").value.trim();
-  const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-  const totalPrice = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-  const orderLines = cart.map(item =>
-    `- ${item.name} × ${item.qty} = ${(item.price * item.qty).toLocaleString()} تومان`
-  ).join("\n");
-
-  // تاریخ و زمان فعلی شمسی
-  const now = new Date();
-  const dateStr = now.toLocaleDateString("fa-IR");
-  const timeStr = now.toLocaleTimeString("fa-IR");
-
-  const fullMessage = `🍪 سفارش جدید از Cookie Haven:
-📅 تاریخ سفارش: ${dateStr} - ${timeStr}
-👤 نام: ${name}
-📱 تماس: ${phone}
-🏠 آدرس: ${address}
-🛒 سفارشات:
-${orderLines}
-💰 جمع کل: ${totalPrice.toLocaleString()} تومان
-
-💳 اطلاعات پرداخت:
-- مبلغ واریزی: ${amount} تومان
-- تاریخ واریز: ${date}
-- کد پیگیری: ${tracking}`;
-
-  console.log("پیام ارسالی به تلگرام:", fullMessage);
-
-  // ارسال به تلگرام
-  fetch("https://api.telegram.org/bot8498305203:AAGTSIPm-EqhwXiYqMEGMdaTUCjwcVLE6g0/sendMessage", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      chat_id: "64410546",
-      text: fullMessage
-    })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.ok) {
-      statusText.innerText = "✅ سفارش و اطلاعات پرداخت با موفقیت ارسال شد!";
-      paymentStatus.innerText = "";
-      paymentInfoSection.style.display = "none";
-      orderForm.reset();
-      paymentForm.reset();
-      localStorage.removeItem("cart");
-      if (typeof renderCart === "function") renderCart();  // اگر cart.js لود شده باشد
-    } else {
-      paymentStatus.innerText = "❌ ارسال به تلگرام با خطا مواجه شد.";
-      console.error("Telegram API error:", data);
-    }
-  })
-  .catch(err => {
-    paymentStatus.innerText = "❌ خطا در اتصال به سرور تلگرام.";
-    console.error("Fetch error:", err);
-  });
 });
