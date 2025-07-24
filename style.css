@@ -1,39 +1,32 @@
-body {
-  font-family: sans-serif;
-  max-width: 600px;
-  margin: auto;
-  padding: 1rem;
-  direction: rtl;
-  background: #fffaf5;
-}
-
-header, footer {
-  text-align: center;
+#filter-search-container {
   margin: 1rem 0;
+  text-align: center;
 }
 
-.product, .cart-item {
-  background: #fff;
-  padding: 1rem;
-  margin: 0.5rem 0;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+#filter-buttons {
+  margin-top: 0.5rem;
 }
 
-button {
-  background: #d2691e;
-  color: white;
+#filter-buttons button {
+  background: #f4e2d8;
+  color: #333;
   border: none;
   padding: 0.5rem 1rem;
-  margin-top: 0.5rem;
+  margin: 0 0.3rem;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
 }
 
-input, textarea {
-  width: 100%;
-  margin: 0.5rem 0;
+#filter-buttons button:hover {
+  background: #e2cfc0;
+}
+
+#search-input {
   padding: 0.5rem;
+  width: 70%;
+  max-width: 300px;
   border: 1px solid #ccc;
   border-radius: 5px;
 }
