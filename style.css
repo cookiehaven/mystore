@@ -1,32 +1,16 @@
-#filter-search-container {
-  margin: 1rem 0;
+#product-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.product {
+  width: 250px;
+  background: #fff;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   text-align: center;
-}
-
-#filter-buttons {
-  margin-top: 0.5rem;
-}
-
-#filter-buttons button {
-  background: #f4e2d8;
-  color: #333;
-  border: none;
-  padding: 0.5rem 1rem;
-  margin: 0 0.3rem;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background 0.2s;
-}
-
-#filter-buttons button:hover {
-  background: #e2cfc0;
-}
-
-#search-input {
-  padding: 0.5rem;
-  width: 70%;
-  max-width: 300px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
 }
