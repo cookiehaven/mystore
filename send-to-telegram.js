@@ -66,7 +66,7 @@ ${orderLines}
   orderPreviewText.textContent = previewMessage;
   orderPreviewModal.style.display = "flex";
 
-  // ارسال واقعی وقتی تأیید شد
+  // تابع ارسال سفارش
   const sendOrder = () => {
     fetch("https://api.telegram.org/bot8498305203:AAGTSIPm-EqhwXiYqMEGMdaTUCjwcVLE6g0/sendMessage", {
       method: "POST",
@@ -97,7 +97,7 @@ ${orderLines}
     });
   };
 
-  // دکمه‌ها رو تنظیم کن
+  // تنظیم دکمه‌ها
   confirmOrderBtn.onclick = sendOrder;
   cancelOrderBtn.onclick = () => {
     orderPreviewModal.style.display = "none";
