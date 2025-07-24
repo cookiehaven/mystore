@@ -6,27 +6,44 @@ document.getElementById("order-form")?.addEventListener("submit", function (e) {
   const address = document.getElementById("address").value.trim();
   const cart = JSON.parse(localStorage.getItem("cart") || "[]");
 
+  const phoneError = document.getElementById("phone-error");
+  const phoneRegex = /^09\d{9}$/;
+
   if (!name || !phone || !address || cart.length === 0) {
     document.getElementById("status").innerText = "⚠️ لطفاً تمام فیلدها را پر کنید و یک محصول انتخاب کنید.";
     return;
   }
 
-  // محاسبه جمع کل
-  const totalPrice = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  if (!phoneRegex.test(phone)) {
+    phoneError.textContent = "شماره معتبر نیست. مثلاً: 09123456789";
+    return;
+  } else {
+    phoneError.textContent = "";
+  }
 
-  // ساخت متن سفارش با قیمت هر محصول
+  // تاریخ شمسی
+  const now = new Date();
+  const dateStr = now.toLocaleDateString("fa-IR");
+  const timeStr = now.toLocaleTimeString("fa-IR");
+
+  // جمع کل و لیست سفارش
+  const totalPrice = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
   const orderLines = cart.map(item =>
-    `- ${item.name} × ${item.qty} = ${ (item.price * item.qty).toLocaleString()} تومان`
+    `- ${item.name} × ${item.qty} = ${(item.price * item.qty).toLocaleString()} تومان`
   ).join("\n");
 
-  const totalPrice = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  // ساخت پیام نهایی
+  const message = `🍪 سفارش جدید از Cookie Haven:
+📅 تاریخ: ${dateStr} - ${timeStr}
+👤 نام: ${name}
+📱 تماس: ${phone}
+🏠 آدرس: ${address}
+🛒 سفارشات:
+${orderLines}
 
-const orderLines = cart.map(item =>
-  `- ${item.name} × ${item.qty} = ${(item.price * item.qty).toLocaleString()} تومان`
-).join("\n");
+💰 جمع کل: ${totalPrice.toLocaleString()} تومان`;
 
-const message = `🍪 سفارش جدید از Cookie Haven:\n👤 نام: ${name}\n📱 تماس: ${phone}\n🏠 آدرس: ${address}\n🛒 سفارشات:\n${orderLines}\n\n💰 جمع کل: ${totalPrice.toLocaleString()} تومان`;
-
+  // ارسال به تلگرام
   fetch("https://api.telegram.org/bot8498305203:AAGTSIPm-EqhwXiYqMEGMdaTUCjwcVLE6g0/sendMessage", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -50,4 +67,22 @@ const message = `🍪 سفارش جدید از Cookie Haven:\n👤 نام: ${nam
     document.getElementById("status").innerText = "❌ خطا در اتصال به سرور تلگرام.";
     console.error("Fetch error:", err);
   });
+});
+
+// بررسی لحظه‌ای شماره موبایل هنگام تایپ
+document.getElementById("phone")?.addEventListener("input", function () {
+  const phone = this.value.trim();
+  const phoneError = document.getElementById("phone-error");
+  const phoneRegex = /^09\d{9}$/;
+
+  if (phone === "") {
+    phoneError.textContent = "";
+    return;
+  }
+
+  if (!phoneRegex.test(phone)) {
+    phoneError.textContent = "شماره معتبر نیست. مثلاً: 09123456789";
+  } else {
+    phoneError.textContent = "";
+  }
 });
