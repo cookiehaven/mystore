@@ -16,7 +16,6 @@ const paymentTracking = document.getElementById("payment-tracking");
 const paymentStatus = document.getElementById("payment-status");
 
 const phoneRegex = /^09\d{9}$/;
-const cardNumber = "6037 1234 5678 9012"; // شماره کارت شما
 
 // اعتبارسنجی لحظه‌ای شماره موبایل
 phoneInput?.addEventListener("input", () => {
@@ -68,10 +67,7 @@ orderForm?.addEventListener("submit", (e) => {
 🛒 سفارشات:
 ${orderLines}
 
-💰 جمع کل: ${totalPrice.toLocaleString()} تومان
-
-💳 لطفاً مبلغ سفارش را به شماره کارت زیر واریز کنید و سپس اطلاعات پرداخت را وارد نمایید:
-شماره کارت: ${cardNumber}`;
+💰 جمع کل: ${totalPrice.toLocaleString()} تومان`;
 
   // نمایش پنجره پیش‌نمایش
   orderPreviewText.textContent = previewMessage;
@@ -107,7 +103,7 @@ paymentForm.addEventListener("submit", (e) => {
     return;
   }
 
-  // پیام کامل شامل سفارش + اطلاعات پرداخت ساخته می‌شود
+  // حالا پیام کامل شامل سفارش + اطلاعات پرداخت ساخته می‌شود
   const name = document.getElementById("name").value.trim();
   const phone = phoneInput.value.trim();
   const address = document.getElementById("address").value.trim();
@@ -134,9 +130,9 @@ ${orderLines}
 💳 اطلاعات پرداخت:
 - مبلغ واریزی: ${amount} تومان
 - تاریخ واریز: ${date}
-- کد پیگیری: ${tracking}
+- کد پیگیری: ${tracking}`;
 
-💳 شماره کارت واریز: ${cardNumber}`;
+  console.log("پیام ارسالی به تلگرام:", fullMessage);
 
   // ارسال به تلگرام
   fetch("https://api.telegram.org/bot8498305203:AAGTSIPm-EqhwXiYqMEGMdaTUCjwcVLE6g0/sendMessage", {
