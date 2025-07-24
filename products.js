@@ -19,12 +19,12 @@ function renderProducts(filteredProducts) {
   filteredProducts.forEach(p => {
     const card = document.createElement("div");
     card.className = "product";
-    card.innerHTML = 
+    card.innerHTML = `
       <img src="${p.image}" alt="${p.name}" />
       <h2>${p.name}</h2>
       <p>${p.price.toLocaleString()} تومان</p>
       <button onclick="addToCart(${p.id})">افزودن به سبد خرید</button>
-    ;
+    `;
     container.appendChild(card);
   });
 }
