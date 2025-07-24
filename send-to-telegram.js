@@ -20,11 +20,7 @@ const phoneRegex = /^09\d{9}$/;
 // اعتبارسنجی لحظه‌ای شماره موبایل
 phoneInput?.addEventListener("input", () => {
   const phone = phoneInput.value.trim();
-  if (phone === "") {
-    phoneError.textContent = "";
-    return;
-  }
-  phoneError.textContent = phoneRegex.test(phone) ? "" : "شماره معتبر نیست. مثلاً: 09123456789";
+  phoneError.textContent = phone === "" ? "" : (phoneRegex.test(phone) ? "" : "شماره معتبر نیست. مثلاً: 09123456789");
 });
 
 orderForm?.addEventListener("submit", (e) => {
