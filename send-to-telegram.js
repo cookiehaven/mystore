@@ -8,37 +8,14 @@ const orderPreviewText = document.getElementById("order-preview-text");
 const confirmOrderBtn = document.getElementById("confirm-order-btn");
 const cancelOrderBtn = document.getElementById("cancel-order-btn");
 
-const phoneRegex = /^09\d{9}$/;
-
-// مرحله 2: پنجره تایید واریز (در ابتدا مخفی)
-const paymentModalHTML = `
-  <div id="payment-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
-    <div style="background:#fff; padding:20px; border-radius:8px; max-width:400px; width:90%; direction: rtl; text-align: right;">
-      <h3>پرداخت کارت به کارت</h3>
-      <p>لطفاً مبلغ واریزی، تاریخ و کد پیگیری تراکنش را وارد کنید:</p>
-      <p>شماره کارت: <strong>XXXX-XXXX-XXXX-1234</strong></p>
-      <input type="text" id="payment-amount" placeholder="مبلغ واریزی (تومان)" required style="margin-bottom:10px; padding: 6px; width: 100%; box-sizing: border-box;"/>
-      <input type="text" id="payment-date" placeholder="تاریخ واریز (مثلاً 1402/04/03)" required style="margin-bottom:10px; padding: 6px; width: 100%; box-sizing: border-box;"/>
-      <input type="text" id="payment-tracking" placeholder="کد پیگیری تراکنش" required style="margin-bottom:10px; padding: 6px; width: 100%; box-sizing: border-box;"/>
-      <div style="text-align:center; margin-top:10px;">
-        <button id="confirm-payment-btn" style="padding:8px 15px; margin-right:10px;">ارسال اطلاعات پرداخت</button>
-        <button id="cancel-payment-btn" style="padding:8px 15px;">انصراف</button>
-      </div>
-      <p id="payment-status" style="color:red; margin-top:10px;"></p>
-    </div>
-  </div>
-`;
-
-// اضافه کردن پنجره پرداخت به body
-document.body.insertAdjacentHTML("beforeend", paymentModalHTML);
-
-const paymentModal = document.getElementById("payment-modal");
-const paymentAmountInput = document.getElementById("payment-amount");
-const paymentDateInput = document.getElementById("payment-date");
-const paymentTrackingInput = document.getElementById("payment-tracking");
-const confirmPaymentBtn = document.getElementById("confirm-payment-btn");
-const cancelPaymentBtn = document.getElementById("cancel-payment-btn");
+const paymentInfoSection = document.getElementById("payment-info-section");
+const paymentForm = document.getElementById("payment-form");
+const paymentAmount = document.getElementById("payment-amount");
+const paymentDate = document.getElementById("payment-date");
+const paymentTracking = document.getElementById("payment-tracking");
 const paymentStatus = document.getElementById("payment-status");
+
+const phoneRegex = /^09\d{9}$/;
 
 // اعتبارسنجی لحظه‌ای شماره موبایل
 phoneInput?.addEventListener("input", () => {
@@ -95,100 +72,70 @@ ${orderLines}
   // نمایش پنجره پیش‌نمایش
   orderPreviewText.textContent = previewMessage;
   orderPreviewModal.style.display = "flex";
+  paymentInfoSection.style.display = "none";
+  statusText.innerText = "";
 
-  // تابع ارسال سفارش به تلگرام (مرحله اول)
-  const sendOrder = () => {
-    fetch("https://api.telegram.org/bot8498305203:AAGTSIPm-EqhwXiYqMEGMdaTUCjwcVLE6g0/sendMessage", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: "64410546",
-        text: previewMessage
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.ok) {
-        // بعد از ارسال سفارش، پنجره پیش نمایش رو ببند و پنجره پرداخت رو باز کن
-        orderPreviewModal.style.display = "none";
-        paymentModal.style.display = "flex";
-        paymentStatus.textContent = "";
-        // مقداردهی اولیه فیلدهای پرداخت
-        paymentAmountInput.value = totalPrice.toLocaleString();
-        paymentDateInput.value = "";
-        paymentTrackingInput.value = "";
-      } else {
-        statusText.innerText = "❌ ارسال سفارش با خطا مواجه شد.";
-        console.error("Telegram API error:", data);
-      }
-    })
-    .catch(err => {
-      statusText.innerText = "❌ خطا در اتصال به سرور تلگرام.";
-      console.error("Fetch error:", err);
-    })
-    .finally(() => {
-      confirmOrderBtn.removeEventListener("click", sendOrder);
-    });
+  // وقتی کاربر سفارش را تایید کرد، فرم پرداخت نمایش داده شود و پیش‌نمایش بسته شود
+  confirmOrderBtn.onclick = () => {
+    orderPreviewModal.style.display = "none";
+    paymentInfoSection.style.display = "block";
   };
 
-  // تنظیم دکمه‌های تایید و لغو پیش نمایش سفارش
-  confirmOrderBtn.onclick = sendOrder;
+  // لغو سفارش
   cancelOrderBtn.onclick = () => {
     orderPreviewModal.style.display = "none";
     statusText.innerText = "❌ ارسال سفارش لغو شد.";
     confirmOrderBtn.onclick = null;
+    paymentInfoSection.style.display = "none";
   };
 });
 
-// ارسال اطلاعات پرداخت به تلگرام و نمایش پیام تایید به کاربر
-confirmPaymentBtn.onclick = () => {
-  const amount = paymentAmountInput.value.trim();
-  const date = paymentDateInput.value.trim();
-  const trackingCode = paymentTrackingInput.value.trim();
+// ارسال اطلاعات پرداخت
+paymentForm.addEventListener("submit", (e) => {
+  e.preventDefault();
 
-  if (!amount || !date || !trackingCode) {
-    paymentStatus.textContent = "لطفاً همه فیلدهای پرداخت را پر کنید.";
+  const amount = paymentAmount.value.trim();
+  const date = paymentDate.value.trim();
+  const tracking = paymentTracking.value.trim();
+
+  if (!amount || !date || !tracking) {
+    paymentStatus.innerText = "لطفاً تمام فیلدهای اطلاعات پرداخت را پر کنید.";
     return;
   }
 
-  // پیام پرداخت
-  const paymentMessage = `💳 تأیید پرداخت کارت به کارت:
-📅 تاریخ واریز: ${date}
-💰 مبلغ واریزی: ${amount} تومان
-🔖 کد پیگیری: ${trackingCode}`;
+  // حالا پیام کامل شامل سفارش + اطلاعات پرداخت ساخته می‌شود
+  const name = document.getElementById("name").value.trim();
+  const phone = phoneInput.value.trim();
+  const address = document.getElementById("address").value.trim();
+  const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+  const totalPrice = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  const orderLines = cart.map(item =>
+    `- ${item.name} × ${item.qty} = ${(item.price * item.qty).toLocaleString()} تومان`
+  ).join("\n");
 
+  // تاریخ و زمان فعلی شمسی
+  const now = new Date();
+  const dateStr = now.toLocaleDateString("fa-IR");
+  const timeStr = now.toLocaleTimeString("fa-IR");
+
+  const fullMessage = `🍪 سفارش جدید از Cookie Haven:
+📅 تاریخ سفارش: ${dateStr} - ${timeStr}
+👤 نام: ${name}
+📱 تماس: ${phone}
+🏠 آدرس: ${address}
+🛒 سفارشات:
+${orderLines}
+💰 جمع کل: ${totalPrice.toLocaleString()} تومان
+
+💳 اطلاعات پرداخت:
+- مبلغ واریزی: ${amount} تومان
+- تاریخ واریز: ${date}
+- کد پیگیری: ${tracking}`;
+
+  // ارسال به تلگرام
   fetch("https://api.telegram.org/bot8498305203:AAGTSIPm-EqhwXiYqMEGMdaTUCjwcVLE6g0/sendMessage", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       chat_id: "64410546",
-      text: paymentMessage
-    })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.ok) {
-      paymentStatus.style.color = "green";
-      paymentStatus.textContent = "✅ اطلاعات پرداخت با موفقیت ارسال شد. منتظر تأیید نهایی بمانید.";
-      paymentModal.style.display = "none";
-      orderForm.reset();
-      localStorage.removeItem("cart");
-      statusText.innerText = "";
-    } else {
-      paymentStatus.style.color = "red";
-      paymentStatus.textContent = "❌ ارسال اطلاعات پرداخت با خطا مواجه شد.";
-      console.error("Telegram API error:", data);
-    }
-  })
-  .catch(err => {
-    paymentStatus.style.color = "red";
-    paymentStatus.textContent = "❌ خطا در اتصال به سرور تلگرام.";
-    console.error("Fetch error:", err);
-  });
-};
-
-// لغو پرداخت و بازگشت به فرم سفارش
-cancelPaymentBtn.onclick = () => {
-  paymentModal.style.display = "none";
-  statusText.innerText = "❌ ارسال اطلاعات پرداخت لغو شد.";
-};
+      text: fullMessage
