@@ -139,3 +139,25 @@ ${orderLines}
     body: JSON.stringify({
       chat_id: "64410546",
       text: fullMessage
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.ok) {
+      statusText.innerText = "✅ سفارش و اطلاعات پرداخت با موفقیت ارسال شد!";
+      paymentStatus.innerText = "";
+      paymentInfoSection.style.display = "none";
+      orderForm.reset();
+      paymentForm.reset();
+      localStorage.removeItem("cart");
+      if (typeof renderCart === "function") renderCart();  // اگر cart.js لود شده باشد
+    } else {
+      paymentStatus.innerText = "❌ ارسال به تلگرام با خطا مواجه شد.";
+      console.error("Telegram API error:", data);
+    }
+  })
+  .catch(err => {
+    paymentStatus.innerText = "❌ خطا در اتصال به سرور تلگرام.";
+    console.error("Fetch error:", err);
+  });
+});
