@@ -12,6 +12,17 @@
   <main id="cart-items"></main>
 
   <section id="checkout">
+    <!-- پنجره پیش نمایش سفارش (modal) -->
+<div id="order-preview-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:#fff; padding:20px; border-radius:8px; max-width:400px; width:90%; direction: rtl; text-align: right;">
+    <h3>پیش‌نمایش سفارش شما</h3>
+    <pre id="order-preview-text" style="white-space: pre-wrap; font-family: monospace;"></pre>
+    <div style="margin-top:15px; text-align:center;">
+      <button id="confirm-order-btn" style="padding: 8px 15px; margin-right: 10px;">تأیید و ارسال</button>
+      <button id="cancel-order-btn" style="padding: 8px 15px;">لغو</button>
+    </div>
+  </div>
+</div>
     <h2>ثبت سفارش</h2>
     <form id="order-form">
       <input type="text" id="name" placeholder="نام" required />
