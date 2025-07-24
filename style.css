@@ -137,3 +137,7 @@ input, textarea {
   border: 1px solid #ccc;
   border-radius: 5px;
 }
+header h1 a {
+  text-decoration: none;
+  color: inherit;
+}
