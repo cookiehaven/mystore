@@ -5,11 +5,11 @@ document.getElementById("order-form")?.addEventListener("submit", function (e) {
   const address = document.getElementById("address").value;
   const cart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-  const message = `🍪 سفارش جدید از Cookie Haven:%0A
+  const message = `🍪 سفارش جدید از Cookie Haven:\n
 👤 نام: ${name}
 📱 تماس: ${phone}
 🏠 آدرس: ${address}
-🛒 سفارشات:%0A${cart.map(i => `- ${i.name} × ${i.qty}`).join("%0A")}`;
+🛒 سفارشات:\n${cart.map(i => `- ${i.name} × ${i.qty}`).join("\n")}`;
 
   fetch("https://api.telegram.org/bot8498305203:AAGTSIPm-EqhwXiYqMEGMdaTUCjwcVLE6g0/sendMessage", {
     method: "POST",
