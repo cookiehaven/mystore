@@ -8,7 +8,7 @@ function renderProducts(productArray) {
   const container = document.getElementById("product-list");
   if (!container) return;
 
-  container.innerHTML = ""; // پاک کردن محصولات قبلی
+  container.innerHTML = "";
   productArray.forEach(p => {
     const card = document.createElement("div");
     card.className = "product";
@@ -42,6 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
   renderProducts(products);
 });
 
-// دسترسی توابع برای استفاده در HTML (مثل onclick)
+// اضافه کردن توابع به window برای دسترسی در HTML
 window.filterProducts = filterProducts;
 window.searchProducts = searchProducts;
