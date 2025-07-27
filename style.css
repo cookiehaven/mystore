@@ -12,18 +12,20 @@ header, footer {
   margin: 1rem 0;
 }
 
-/* استایل لینک مشاهده سبد خرید در هدر */
-header .cart-link {
-  display: inline-block;
-  margin-top: 0.5rem;
+/* استایل لینک مشاهده سبد خرید زیر فیلتر */
+.cart-link {
+  display: block;
+  text-align: center;
+  margin: 1rem auto 2rem;
   font-size: 1rem;
   color: #d2691e;
   text-decoration: none;
-  transition: color 0.2s;
   cursor: pointer;
+  width: max-content;
+  transition: color 0.2s;
 }
 
-header .cart-link:hover {
+.cart-link:hover {
   color: #a0522d;
 }
 
