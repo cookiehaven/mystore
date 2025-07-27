@@ -12,6 +12,23 @@ header, footer {
   margin: 1rem 0;
 }
 
+/* استایل لینک مشاهده سبد خرید زیر فیلتر */
+.cart-link {
+  display: block;
+  text-align: center;
+  margin: 1rem auto 2rem;
+  font-size: 1rem;
+  color: #d2691e;
+  text-decoration: none;
+  cursor: pointer;
+  width: max-content;
+  transition: color 0.2s;
+}
+
+.cart-link:hover {
+  color: #a0522d;
+}
+
 /* 🔍 فیلتر و جست‌وجو */
 #filter-search-container {
   display: flex;
@@ -137,6 +154,24 @@ input, textarea {
   border: 1px solid #ccc;
   border-radius: 5px;
 }
+
+/* لینک‌های راه ارتباطی */
+#contact-links {
+  margin-top: 1rem;
+  font-size: 1rem;
+}
+
+#contact-links a {
+  color: #d2691e;
+  text-decoration: none;
+  margin: 0 0.5rem;
+  transition: color 0.2s;
+}
+
+#contact-links a:hover {
+  color: #a0522d;
+}
+
 header h1 a {
   text-decoration: none;
   color: inherit;
