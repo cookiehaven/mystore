@@ -2,7 +2,7 @@
 <html lang="fa">
 <head>
   <link rel="shortcut icon" href="images/favicon.png" type="image/png" />
-  <link rel="icon" href="images/favicon.png" type="image/png">
+  <link rel="icon" href="images/favicon.png" type="image/png" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Cookie Haven</title>
@@ -14,8 +14,8 @@
 </head>
 <body>
   <header>
-  <h1><a href="index.html">🍪 Cookie Haven</a></h1>
-</header>
+    <h1><a href="index.html">🍪 Cookie Haven</a></h1>
+  </header>
 
   <!-- 🔍 فیلتر و جست‌وجو -->
   <section id="filter-search-container">
@@ -28,11 +28,22 @@
       <button onclick="filterProducts('cheesecake')">چیزکیک ها</button>
     </div>
   </section>
+  
+  <a class="cart-link" href="cart.html">🛒 مشاهده سبد خرید</a>
 
   <main id="product-list"></main>
 
   <footer>
-    <a href="cart.html">🛒 مشاهده سبد خرید</a>
+    <div id="contact-links">
+      <a href="https://t.me/ali_aliama" target="_blank" rel="noopener noreferrer">
+        <img src="images/telegram.png" alt="تلگرام" width="24" height="24" style="vertical-align:middle;">
+        تلگرام
+      </a> |
+      <a href="https://www.instagram.com/cookiie_haven" target="_blank" rel="noopener noreferrer">
+        <img src="images/instagram.png" alt="اینستاگرام" width="24" height="24" style="vertical-align:middle;">
+        اینستاگرام
+      </a>
+    </div>
   </footer>
 
   <script src="products.js"></script>
