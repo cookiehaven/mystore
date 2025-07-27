@@ -34,26 +34,14 @@
     <p id="status"></p>
   </section>
 
-  <section id="payment-info-section" class="hidden-section">
-    <h3>اطلاعات پرداخت</h3>
-    <p>لطفاً مبلغ واریزی، تاریخ و کد پیگیری تراکنش را وارد کنید.</p>
-    <p class="payment-info-note">
-      <strong>شماره کارت:</strong> 6037 1234 5678 9012<br/>
-      <small>برای هربار پرداخت به شماره کارت جدید فقط واریزی انجام بدین لطفا.</small>
-    </p>
-    <form id="payment-form" autocomplete="off">
-      <input type="text" id="payment-amount" placeholder="مبلغ واریزی (تومان)" required />
-      <input type="text" id="payment-date" placeholder="تاریخ واریز (مثلاً 1402/04/01)" required />
-      <input type="text" id="payment-tracking" placeholder="کد پیگیری تراکنش" required />
-      <button type="submit">ارسال اطلاعات پرداخت</button>
-    </form>
-    <p id="payment-status"></p>
+  <section id="payment-info-section" class="hidden">
+    <p>برای پرداخت، لطفاً از لینک زیر استفاده کنید:</p>
+    <p>پرداخت به شماره کارت: <strong>1234 5678 9012 3456</strong></p>
+    <a href="https://your-payment-link.com" target="_blank">پرداخت آنلاین</a>
+    <button id="close-payment-info">بستن</button>
   </section>
 
-  <footer>
-    <a href="index.html" class="back-to-shop-btn">🏠 بازگشت به فروشگاه</a>
-  </footer>
-
+  <script src="products.js"></script>
   <script src="cart.js"></script>
   <script src="send-to-telegram.js"></script>
 </body>
