@@ -1,238 +1,126 @@
-/* فونت و تنظیمات پایه */
 body {
-  font-family: 'Vazir', Tahoma, sans-serif;
-  max-width: 1200px;
-  margin: auto;
-  padding: 1rem;
+  font-family: Vazir, Tahoma, Arial, sans-serif;
   direction: rtl;
-  background: #fffaf5;
+  padding: 1rem;
+  max-width: 900px;
+  margin: auto;
+}
+
+header h1 a {
+  text-decoration: none;
   color: #333;
 }
 
-/* هدر و فوتر */
-header, footer {
-  text-align: center;
-  margin: 1rem 0;
-}
-
-/* دکمه بازگشت به فروشگاه */
-.back-to-shop-btn {
-  display: inline-block;
-  background: #d2691e;
-  color: white;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 1rem;
-  margin: 1.5rem auto;
-  transition: background-color 0.3s;
-}
-
-.back-to-shop-btn:hover {
-  background: #a0522d;
-  color: #fff;
-}
-
-/* سبد خرید */
-#cart-items {
-  margin-bottom: 1.5rem;
-}
-
-.cart-item {
-  background: #fff;
-  padding: 1rem;
-  margin: 0.5rem 0;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+#product-list {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   gap: 1rem;
 }
 
-.cart-item img {
-  width: 60px;
-  height: 60px;
-  border-radius: 8px;
+.product {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  width: 200px;
+  text-align: center;
+  border-radius: 5px;
+}
+
+.product img {
+  max-width: 100%;
+  height: 130px;
   object-fit: cover;
+  border-radius: 5px;
 }
 
-.cart-item span {
-  flex: 1;
-  font-weight: 600;
+button {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  margin-top: 0.5rem;
+  border: none;
+  border-radius: 3px;
+  background-color: #3498db;
+  color: white;
+  font-weight: bold;
+  transition: background-color 0.3s;
 }
 
-.cart-item > div {
+button:hover {
+  background-color: #2980b9;
+}
+
+#cart-items {
+  margin: 1rem 0;
+}
+
+.cart-item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  border-bottom: 1px solid #ddd;
+  padding: 0.5rem 0;
+}
+
+.cart-item img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
 }
 
 .cart-item button {
-  background: #d2691e;
-  color: white;
-  border: none;
-  padding: 0.25rem 0.7rem;
-  border-radius: 5px;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.cart-item button:hover {
-  background: #a0522d;
-}
-
-.cart-item > span:last-child {
-  font-weight: 700;
-  min-width: 100px;
-  text-align: left;
-}
-
-/* جمع کل */
-#cart-items hr {
-  margin: 1rem 0;
-  border: none;
-  border-top: 1px solid #ddd;
-}
-
-#cart-items > div:last-child {
-  font-weight: 700;
-  font-size: 1.2rem;
-  text-align: left;
-  padding-left: 10px;
-}
-
-/* فرم‌ها */
-form {
-  max-width: 400px;
-  margin: auto;
-}
-
-input, textarea {
-  width: 100%;
-  margin: 0.5rem 0;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 5px;
   font-size: 1rem;
-  box-sizing: border-box;
+  padding: 0 0.5rem;
 }
 
-textarea {
-  resize: vertical;
-  min-height: 70px;
-}
-
-/* دکمه فرم */
-button[type="submit"] {
-  background: #d2691e;
-  color: white;
-  border: none;
-  padding: 0.7rem 1.5rem;
-  border-radius: 6px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-button[type="submit"]:hover {
-  background: #a0522d;
-}
-
-/* خطا و وضعیت */
-#phone-error, #status, #payment-status {
-  font-size: 0.9rem;
-  color: #b22222;
-  margin-top: 0.3rem;
-  min-height: 20px;
-  display: block;
-  text-align: right;
-}
-
-/* modal */
 #order-preview-modal {
-  display: flex;
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  display: none;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  z-index: 10;
 }
 
-.modal-hidden {
-  display: none !important;
-}
-
-.modal-content {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
+#order-preview-modal .modal-content {
+  background: white;
+  padding: 1rem 2rem;
+  border-radius: 5px;
   max-width: 400px;
   width: 90%;
-  direction: rtl;
-  text-align: right;
-  box-sizing: border-box;
 }
 
 .order-preview-text {
-  white-space: pre-wrap;
-  font-family: monospace;
-  background: #f9f9f9;
-  padding: 10px;
-  border-radius: 5px;
-  max-height: 250px;
+  background: #f7f7f7;
+  padding: 1rem;
+  height: 200px;
   overflow-y: auto;
-  margin-top: 0.5rem;
+  white-space: pre-wrap;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-family: monospace;
+  font-size: 0.9rem;
 }
 
 .modal-buttons {
-  margin-top: 15px;
-  text-align: center;
+  display: flex;
+  justify-content: space-between;
 }
 
-.modal-buttons button {
-  padding: 8px 15px;
-  margin: 0 8px;
-  cursor: pointer;
-  border: none;
-  border-radius: 5px;
-  font-weight: 600;
-  transition: background-color 0.3s;
-}
-
-#confirm-order-btn {
-  background: #d2691e;
-  color: white;
-}
-
-#confirm-order-btn:hover {
-  background: #a0522d;
-}
-
-#cancel-order-btn {
-  background: #ccc;
-  color: #333;
-}
-
-#cancel-order-btn:hover {
-  background: #999;
-}
-
-/* بخش اطلاعات پرداخت مخفی اولیه */
-.hidden-section {
+.hidden {
   display: none;
 }
 
-/* یادداشت در بخش پرداخت */
-.payment-info-note {
-  background: #fffbcc;
-  padding: 10px;
-  border: 1px solid #f0e68c;
+#phone-error {
+  color: red;
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+}
+
+#payment-info-section {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #3498db;
   border-radius: 5px;
-  margin-bottom: 15px;
-  color: #b22222;
-  font-size: 0.9rem;
+  background-color: #eaf4fb;
 }
