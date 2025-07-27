@@ -1,48 +1,0 @@
-<!DOCTYPE html>
-<html lang="fa">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>سبد خرید</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <header><h1>🛒 سبد خرید</h1></header>
-
-  <main id="cart-items"></main>
-
-  <section id="checkout">
-    <div id="order-preview-modal" class="modal-hidden">
-      <div class="modal-content">
-        <h3>پیش‌نمایش سفارش شما</h3>
-        <pre id="order-preview-text" class="order-preview-text"></pre>
-        <div class="modal-buttons">
-          <button id="confirm-order-btn">تأیید و ادامه پرداخت</button>
-          <button id="cancel-order-btn">لغو</button>
-        </div>
-      </div>
-    </div>
-
-    <h2>ثبت سفارش</h2>
-    <form id="order-form" autocomplete="off">
-      <input type="text" id="name" placeholder="نام" required />
-      <input type="text" id="phone" placeholder="شماره تماس" required />
-      <span id="phone-error"></span>
-      <textarea id="address" placeholder="آدرس" required></textarea>
-      <button type="submit">ارسال سفارش</button>
-    </form>
-    <p id="status"></p>
-  </section>
-
-  <section id="payment-info-section" class="hidden">
-    <p>برای پرداخت، لطفاً از لینک زیر استفاده کنید:</p>
-    <p>پرداخت به شماره کارت: <strong>1234 5678 9012 3456</strong></p>
-    <a href="https://your-payment-link.com" target="_blank">پرداخت آنلاین</a>
-    <button id="close-payment-info">بستن</button>
-  </section>
-
-  <script src="products.js"></script>
-  <script src="cart.js"></script>
-  <script src="send-to-telegram.js"></script>
-</body>
-</html>
