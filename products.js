@@ -3,6 +3,8 @@ const products = [
   { id: 2, name: "چیزکیک لوتوس", category: "cheesecake", price: 80000, image: "images/lotos.chesese.cake.jpg" },
   { id: 3, name: "کوکی بادام‌زمینی", category: "cookie", price: 55000, image: "images/cookie-peanut.jpg" },
   { id: 4, name: "چیز کیک مارس", category: "cheesecake", price: 80000, image: "images/cheese.cake.mars.jpg" },
+  { id: 5, name: "چیز کیک مارس", category: "cheesecake", price: 80000, image: "images/cheese.cake.mars.jpg" },
+  { id: 6, name: "چیز کیک مارس", category: "cheesecake", price: 80000, image: "images/cheese.cake.mars.jpg" },
 ];
 
 function renderProducts(productArray) {
