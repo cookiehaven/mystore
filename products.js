@@ -1,5 +1,5 @@
 const products = [
-  { id: 1, name: "کوکی شکلاتی", category: "cookie", price: 50000, image: "images/cookie-chocolate.jpg" },
+  { id: 1, name: "کوکی شکلاتی", category: "cookie", price: 80000, image: "images/cookie-chocolate.jpg" },
   { id: 2, name: "چیزکیک لوتوس", category: "cheesecake", price: 80000, image: "images/lotos.chesese.cake.jpg" },
   { id: 3, name: "کوکی بادام‌زمینی", category: "cookie", price: 55000, image: "images/cookie-peanut.jpg" }
 ];
