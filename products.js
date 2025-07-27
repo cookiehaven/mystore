@@ -5,6 +5,8 @@ const products = [
   { id: 4, name: "چیزکیک مارس", category: "cheesecake", price: 80000, image: "images/cheese.cake.mars.jpg" },
   { id: 5, name: "کیک هویج گردو", category: "cake", price: 50000, image: "images/cake.havij.gerdo.jpg" },
   { id: 6, name: "کیک خیس شکلاتی", category: "cake", price: 50000, image: "images/cake.khis.shokolati.jpg" },
+  { id: 7, name: "کیک ردولوت", category: "cake", price: 50000, image: "images/cake.redvevet.jpg" },
+  { id: 8, name: "کیک نوتلا", category: "cake", price: 50000, image: "images/cheeese.cake.nutela.jpg" },
 ];
 
 function renderProducts(productArray) {
