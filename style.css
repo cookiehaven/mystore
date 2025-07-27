@@ -12,6 +12,21 @@ header, footer {
   margin: 1rem 0;
 }
 
+/* استایل لینک مشاهده سبد خرید در هدر */
+header .cart-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: #d2691e;
+  text-decoration: none;
+  transition: color 0.2s;
+  cursor: pointer;
+}
+
+header .cart-link:hover {
+  color: #a0522d;
+}
+
 /* 🔍 فیلتر و جست‌وجو */
 #filter-search-container {
   display: flex;
