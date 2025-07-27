@@ -1,5 +1,5 @@
-const TELEGRAM_BOT_TOKEN = "YOUR_BOT_TOKEN_HERE";
-const TELEGRAM_CHAT_ID = "YOUR_CHAT_ID_HERE";
+const TELEGRAM_BOT_TOKEN = "8498305203:AAGTSIPm-EqhwXiYqMEGMdaTUCjwcVLE6g0";
+const TELEGRAM_CHAT_ID = "64410546";
 
 function formatOrder(cart, userInfo) {
   let text = "📦 سفارش جدید:\n\n";
@@ -85,13 +85,13 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function sendOrderToTelegram(text) {
-  const url = `https://api.telegram.org/bot${8498305203:AAGTSIPm-EqhwXiYqMEGMdaTUCjwcVLE6g0}/sendMessage`;
+  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
   try {
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        chat_id: 64410546,
+        chat_id: TELEGRAM_CHAT_ID,
         text,
         parse_mode: "HTML",
       }),
