@@ -1,79 +1,72 @@
-const adminUID = "Vuw3WMJA3Vhrp5OpudAO40FtmbP2"; // این مقدار را از Firebase بگیرید
+// مدیریت سبد خرید در localStorage
+function getCart() {
+  try {
+    return JSON.parse(localStorage.getItem("cart")) || [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCart(cart) {
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+function addToCart(productId) {
+  const product = products.find(p => p.id === productId);
+  if (!product) return;
+
+  const cart = getCart();
+  const existing = cart.find(item => item.id === productId);
+  if (existing) {
+    existing.quantity++;
+  } else {
+    cart.push({ id: product.id, name: product.name, price: product.price, quantity: 1 });
+  }
+  saveCart(cart);
+  alert("به سبد خرید اضافه شد");
+  renderCart();
+}
+
+function renderCart() {
+  // اگر صفحه سبد خرید هست، کد نمایش سبد را اضافه کن
+  // این تابع فرضا در cart.js هم هست
+}
+
+// مدیریت ورود و ثبت‌نام با Firebase Auth
+
+firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    document.getElementById("auth-section").style.display = "none";
+    document.getElementById("order-section").style.display = "block";
+  } else {
+    document.getElementById("auth-section").style.display = "block";
+    document.getElementById("order-section").style.display = "none";
+  }
+});
 
 function login() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  auth.signInWithEmailAndPassword(email, password)
-    .then(() => location.reload())
-    .catch(() => {
-      auth.createUserWithEmailAndPassword(email, password)
-        .then(() => location.reload())
-        .catch(err => alert(err.message));
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  if (!email || !password) {
+    alert("ایمیل و رمز عبور را وارد کنید.");
+    return;
+  }
+  firebase.auth().signInWithEmailAndPassword(email, password)
+    .then(() => {
+      alert("ورود موفق بود");
+    })
+    .catch(error => {
+      if (error.code === "auth/user-not-found") {
+        // ثبت نام خودکار
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+          .then(() => alert("ثبت‌نام موفق بود"))
+          .catch(e => alert("خطا در ثبت‌نام: " + e.message));
+      } else {
+        alert("خطا در ورود: " + error.message);
+      }
     });
 }
 
 function logout() {
-  auth.signOut().then(() => location.href = "index.html");
-}
-
-auth.onAuthStateChanged(user => {
-  if (!user) return;
-  if (location.pathname.includes("admin")) {
-    if (user.uid === adminUID) loadAllOrders();
-    else {
-      alert("دسترسی فقط برای مدیر است");
-      logout();
-    }
-  } else {
-    document.getElementById("auth-section").style.display = "none";
-    document.getElementById("order-section").style.display = "block";
-  }
-});
-
-function submitOrder() {
-  const name = document.getElementById("name").value;
-  const phone = document.getElementById("phone").value;
-  const items = document.getElementById("items").value;
-  const user = auth.currentUser;
-  if (!user) return alert("ابتدا وارد شوید");
-
-  db.collection("orders").add({
-    userId: user.uid,
-    name,
-    phone,
-    items,
-    createdAt: new Date()
-  }).then(() => alert("سفارش ثبت شد"));
-}
-
-function viewOrders() {
-  const user = auth.currentUser;
-  if (!user) return;
-  db.collection("orders").where("userId", "==", user.uid)
-    .orderBy("createdAt", "desc")
-    .get().then(snapshot => {
-      const data = snapshot.docs.map(doc => doc.data());
-      alert("سفارش‌های شما:
-
-" + data.map(d => d.items).join("\n---\n"));
-    });
-}
-
-function loadAllOrders() {
-  db.collection("orders").orderBy("createdAt", "desc").get()
-    .then(snapshot => {
-      const container = document.getElementById("orders");
-      snapshot.forEach(doc => {
-        const d = doc.data();
-        const div = document.createElement("div");
-        div.innerHTML = `
-          <hr>
-          <p><b>نام:</b> ${d.name}</p>
-          <p><b>شماره:</b> ${d.phone}</p>
-          <p><b>سفارش:</b> ${d.items}</p>
-          <p><b>تاریخ:</b> ${d.createdAt.toDate().toLocaleString()}</p>
-        `;
-        container.appendChild(div);
-      });
-    });
+  firebase.auth().signOut();
 }
