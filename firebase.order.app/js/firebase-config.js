@@ -1,8 +1,8 @@
 // ⚠️ مقدارها را از داشبورد Firebase خود جایگزین کنید
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
+  apiKey: "AIzaSyDbJwM4NRLxxgRxIPDpzV6T1wDaBjVmMtw",
+  authDomain: "mycookie-a1439.firebaseapp.com",
+  projectId: "mycookie-a1439",
 };
 
 firebase.initializeApp(firebaseConfig);
