@@ -1,4 +1,7 @@
-const orderForm = document.getElementById("order-form");
+// کنترل فعال یا غیر فعال بودن ارسال به تلگرام
+const enableTelegramSend = true; // true برای فعال، false برای غیرفعال
+
+const orderForm = document.getElementById("order-section");
 const phoneInput = document.getElementById("phone");
 const phoneError = document.getElementById("phone-error");
 const statusText = document.getElementById("status");
@@ -24,142 +27,177 @@ phoneInput?.addEventListener("input", () => {
     phoneError.textContent = "";
     return;
   }
-  phoneError.textContent = phoneRegex.test(phone) ? "" : "شماره معتبر نیست. مثلاً: 09123456789";
+  phoneError.textContent = phoneRegex.test(phone)
+    ? ""
+    : "شماره موبایل باید با 09 شروع و 11 رقم باشد";
 });
 
-orderForm?.addEventListener("submit", (e) => {
-  e.preventDefault();
+// نمایش فرم سفارش و مخفی کردن فرم ورود
+function showOrderSection() {
+  document.getElementById("auth-section").style.display = "none";
+  orderForm.style.display = "block";
+}
 
-  const name = document.getElementById("name").value.trim();
-  const phone = phoneInput.value.trim();
-  const address = document.getElementById("address").value.trim();
-  const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-  if (!name || !phone || !address || cart.length === 0) {
-    statusText.innerText = "⚠️ لطفاً تمام فیلدها را پر کنید و یک محصول انتخاب کنید.";
-    return;
+// اعتبارسنجی اولیه فرم سفارش
+function validateOrder(name, phone, address, cart) {
+  if (!name) {
+    statusText.textContent = "نام را وارد کنید.";
+    return false;
   }
-
   if (!phoneRegex.test(phone)) {
-    phoneError.textContent = "شماره معتبر نیست. مثلاً: 09123456789";
-    return;
-  } else {
-    phoneError.textContent = "";
+    statusText.textContent = "شماره موبایل معتبر نیست.";
+    return false;
   }
+  if (!address) {
+    statusText.textContent = "آدرس را وارد کنید.";
+    return false;
+  }
+  if (!cart || cart.length === 0) {
+    statusText.textContent = "سبد خرید خالی است.";
+    return false;
+  }
+  statusText.textContent = "";
+  return true;
+}
 
-  // تاریخ شمسی
-  const now = new Date();
-  const dateStr = now.toLocaleDateString("fa-IR");
-  const timeStr = now.toLocaleTimeString("fa-IR");
+function getCartItems() {
+  const cartJson = localStorage.getItem("cart");
+  if (!cartJson) return [];
+  try {
+    return JSON.parse(cartJson);
+  } catch {
+    return [];
+  }
+}
 
-  // جمع کل و لیست سفارش
-  const totalPrice = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-  const orderLines = cart.map(item =>
-    `- ${item.name} × ${item.qty} = ${(item.price * item.qty).toLocaleString()} تومان`
-  ).join("\n");
+function buildOrderMessage(name, phone, address, cart, totalPrice) {
+  let message = `سفارش جدید:\nنام: ${name}\nشماره تماس: ${phone}\nآدرس: ${address}\n\nمحصولات:\n`;
+  cart.forEach(item => {
+    message += `${item.name} - تعداد: ${item.quantity} - قیمت واحد: ${item.price.toLocaleString()} تومان\n`;
+  });
+  message += `\nمجموع قیمت: ${totalPrice.toLocaleString()} تومان`;
+  return message;
+}
 
-  // پیام پیش‌نمایش
-  const previewMessage = `🍪 سفارش جدید از Cookie Haven:
-📅 تاریخ: ${dateStr} - ${timeStr}
-👤 نام: ${name}
-📱 تماس: ${phone}
-🏠 آدرس: ${address}
-🛒 سفارشات:
-${orderLines}
+function submitOrder() {
+  const name = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const address = document.getElementById("address").value.trim();
+  const cart = getCartItems();
+  const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-💰 جمع کل: ${totalPrice.toLocaleString()} تومان`;
+  if (!validateOrder(name, phone, address, cart)) return;
 
-  // نمایش پنجره پیش‌نمایش
-  orderPreviewText.textContent = previewMessage;
+  const orderMessage = buildOrderMessage(name, phone, address, cart, totalPrice);
+  orderPreviewText.textContent = orderMessage;
   orderPreviewModal.style.display = "flex";
-  paymentInfoSection.style.display = "none";
-  statusText.innerText = "";
 
-  // وقتی کاربر سفارش را تایید کرد، فرم پرداخت نمایش داده شود و پیش‌نمایش بسته شود
-  confirmOrderBtn.onclick = () => {
+  // تایید سفارش:
+  confirmOrderBtn.onclick = async () => {
     orderPreviewModal.style.display = "none";
-    paymentInfoSection.style.display = "block";
+
+    try {
+      await firebase.firestore().collection("orders").add({
+        name,
+        phone,
+        address,
+        cart,
+        totalPrice,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        payment: null,
+        userEmail: firebase.auth().currentUser?.email || null,
+      });
+
+      if (enableTelegramSend) {
+        fetch("https://api.telegram.org/botYOUR_BOT_TOKEN/sendMessage", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: "YOUR_CHAT_ID",
+            text: orderMessage,
+          }),
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.ok) {
+              statusText.textContent = "✅ سفارش و اطلاعات پرداخت با موفقیت ارسال شد!";
+            } else {
+              console.warn("ارسال به تلگرام ناموفق بود، اما سفارش ثبت شد:", data);
+              statusText.textContent = "⚠️ سفارش ثبت شد، ولی ارسال به تلگرام انجام نشد.";
+            }
+          })
+          .catch(err => {
+            console.error("خطا در ارسال به تلگرام (ولی سفارش ثبت شد):", err);
+            statusText.textContent = "⚠️ سفارش ثبت شد، ولی ارسال به تلگرام موفق نبود.";
+          });
+      } else {
+        statusText.textContent = "✅ سفارش با موفقیت ثبت شد.";
+      }
+
+      paymentInfoSection.style.display = "block";
+      paymentStatus.textContent = "";
+    } catch (error) {
+      console.error("خطا در ثبت سفارش در Firebase:", error);
+      statusText.textContent = "❌ خطا در ثبت سفارش، لطفاً دوباره تلاش کنید.";
+    }
   };
 
-  // لغو سفارش
   cancelOrderBtn.onclick = () => {
     orderPreviewModal.style.display = "none";
-    statusText.innerText = "❌ ارسال سفارش لغو شد.";
-    confirmOrderBtn.onclick = null;
-    paymentInfoSection.style.display = "none";
+    statusText.textContent = "سفارش لغو شد.";
   };
-});
+}
 
-// ارسال اطلاعات پرداخت
-paymentForm.addEventListener("submit", (e) => {
+paymentForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const amount = paymentAmount.value.trim();
-  const date = paymentDate.value.trim();
+  const date = paymentDate.value;
   const tracking = paymentTracking.value.trim();
 
   if (!amount || !date || !tracking) {
-    paymentStatus.innerText = "لطفاً تمام فیلدهای اطلاعات پرداخت را پر کنید.";
+    paymentStatus.textContent = "لطفا همه فیلدهای پرداخت را پر کنید.";
     return;
   }
 
-  // حالا پیام کامل شامل سفارش + اطلاعات پرداخت ساخته می‌شود
-  const name = document.getElementById("name").value.trim();
-  const phone = phoneInput.value.trim();
-  const address = document.getElementById("address").value.trim();
-  const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-  const totalPrice = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-  const orderLines = cart.map(item =>
-    `- ${item.name} × ${item.qty} = ${(item.price * item.qty).toLocaleString()} تومان`
-  ).join("\n");
-
-  // تاریخ و زمان فعلی شمسی
-  const now = new Date();
-  const dateStr = now.toLocaleDateString("fa-IR");
-  const timeStr = now.toLocaleTimeString("fa-IR");
-
-  const fullMessage = `🍪 سفارش جدید از Cookie Haven:
-📅 تاریخ سفارش: ${dateStr} - ${timeStr}
-👤 نام: ${name}
-📱 تماس: ${phone}
-🏠 آدرس: ${address}
-🛒 سفارشات:
-${orderLines}
-💰 جمع کل: ${totalPrice.toLocaleString()} تومان
-
-💳 اطلاعات پرداخت:
-- مبلغ واریزی: ${amount} تومان
-- تاریخ واریز: ${date}
-- کد پیگیری: ${tracking}`;
-
-  console.log("پیام ارسالی به تلگرام:", fullMessage);
-
-  // ارسال به تلگرام
-  fetch("https://api.telegram.org/bot8498305203:AAGTSIPm-EqhwXiYqMEGMdaTUCjwcVLE6g0/sendMessage", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      chat_id: "64410546",
-      text: fullMessage
-    })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.ok) {
-      statusText.innerText = "✅ سفارش و اطلاعات پرداخت با موفقیت ارسال شد!";
-      paymentStatus.innerText = "";
-      paymentInfoSection.style.display = "none";
-      orderForm.reset();
-      paymentForm.reset();
-      localStorage.removeItem("cart");
-      if (typeof renderCart === "function") renderCart();  // اگر cart.js لود شده باشد
-    } else {
-      paymentStatus.innerText = "❌ ارسال به تلگرام با خطا مواجه شد.";
-      console.error("Telegram API error:", data);
+  try {
+    // ذخیره اطلاعات پرداخت آخرین سفارش کاربر (می‌توان بهبود داد برای ذخیره مشخص‌تر)
+    const userEmail = firebase.auth().currentUser?.email;
+    if (!userEmail) {
+      paymentStatus.textContent = "ابتدا وارد شوید.";
+      return;
     }
-  })
-  .catch(err => {
-    paymentStatus.innerText = "❌ خطا در اتصال به سرور تلگرام.";
-    console.error("Fetch error:", err);
-  });
+
+    // یافتن آخرین سفارش کاربر
+    const ordersRef = firebase.firestore().collection("orders");
+    const querySnapshot = await ordersRef
+      .where("userEmail", "==", userEmail)
+      .orderBy("createdAt", "desc")
+      .limit(1)
+      .get();
+
+    if (querySnapshot.empty) {
+      paymentStatus.textContent = "سفارشی برای ثبت پرداخت یافت نشد.";
+      return;
+    }
+
+    const orderDoc = querySnapshot.docs[0];
+
+    await orderDoc.ref.update({
+      payment: {
+        amount: Number(amount),
+        date,
+        tracking,
+      },
+    });
+
+    paymentStatus.style.color = "green";
+    paymentStatus.textContent = "اطلاعات پرداخت با موفقیت ثبت شد.";
+    paymentForm.reset();
+    paymentInfoSection.style.display = "none";
+  } catch (error) {
+    console.error("خطا در ثبت اطلاعات پرداخت:", error);
+    paymentStatus.style.color = "red";
+    paymentStatus.textContent = "خطا در ثبت اطلاعات پرداخت، دوباره تلاش کنید.";
+  }
 });
