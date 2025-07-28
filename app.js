@@ -1,134 +1,234 @@
-(() => {
-  // گرفتن عناصر از DOM
-  const authSection = document.getElementById('auth-section');
-  const orderSection = document.getElementById('order-section');
-  const statusText = document.getElementById('status');
-  const phoneError = document.getElementById('phone-error');
+// ایمیل ادمین (اینجا تغییر بده به ایمیل خودت)
+const ADMIN_EMAIL = 'holmzjack@gmail.com';
 
-  // تابع ورود / ثبت‌نام
-  function login() {
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
+// ارجاع به Firebase
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-    if (!email || !password) {
-      statusText.textContent = 'لطفاً ایمیل و رمز عبور را وارد کنید.';
-      return;
-    }
+// نمایش و مخفی کردن بخش‌ها
+const authSection = document.getElementById('auth-section');
+const orderSection = document.getElementById('order-section');
+const adminSection = document.getElementById('admin-section');
+const authStatus = document.getElementById('auth-status');
+const statusText = document.getElementById('status');
+const allOrdersList = document.getElementById('all-orders-list');
 
-    auth.signInWithEmailAndPassword(email, password)
-      .then(() => {
-        showOrderSection();
-      })
-      .catch((error) => {
-        if (error.code === 'auth/user-not-found') {
-          auth.createUserWithEmailAndPassword(email, password)
-            .then(() => {
-              showOrderSection();
-            })
-            .catch((err) => {
-              statusText.textContent = 'خطا در ثبت‌نام: ' + err.message;
-            });
-        } else {
-          statusText.textContent = 'خطا در ورود: ' + error.message;
-        }
-      });
+function clearStatus() {
+  authStatus.textContent = '';
+  statusText.textContent = '';
+}
+
+// ثبت‌نام کاربر جدید
+function signup() {
+  clearStatus();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+
+  if (!email || !password) {
+    authStatus.textContent = 'لطفاً ایمیل و رمز عبور را وارد کنید.';
+    return;
   }
 
-  // تابع خروج
-  function logout() {
-    auth.signOut().then(() => {
-      authSection.style.display = 'block';
-      orderSection.style.display = 'none';
-      statusText.textContent = 'با موفقیت خارج شدید.';
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(() => {
+      authStatus.style.color = 'green';
+      authStatus.textContent = 'ثبت‌نام موفقیت‌آمیز بود. اکنون وارد شوید.';
+    })
+    .catch(error => {
+      authStatus.style.color = 'red';
+      authStatus.textContent = 'خطا در ثبت‌نام: ' + error.message;
     });
+}
+
+// ورود کاربر
+function login() {
+  clearStatus();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+
+  if (!email || !password) {
+    authStatus.textContent = 'لطفاً ایمیل و رمز عبور را وارد کنید.';
+    return;
   }
 
-  // نمایش فرم سفارش برای کاربر واردشده
-  function showOrderSection() {
-    authSection.style.display = 'none';
-    orderSection.style.display = 'block';
-    statusText.textContent = '';
-  }
+  auth.signInWithEmailAndPassword(email, password)
+    .then(() => {
+      authSection.style.display = 'none';
 
-  // ثبت سفارش
-  function submitOrder() {
-    const name = document.getElementById('name').value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    const address = document.getElementById('address').value.trim();
+      if (email === ADMIN_EMAIL) {
+        adminSection.style.display = 'block';
+        orderSection.style.display = 'none';
+        loadAllOrders();
+      } else {
+        orderSection.style.display = 'block';
+        adminSection.style.display = 'none';
+      }
+      statusText.style.color = 'green';
+      statusText.textContent = 'وارد شدید!';
+    })
+    .catch(error => {
+      authStatus.style.color = 'red';
+      authStatus.textContent = 'خطا در ورود: ' + error.message;
+    });
+}
 
-    if (!name || !phone || !address) {
-      phoneError.textContent = 'لطفاً تمام فیلدها را پر کنید.';
-      return;
-    }
-
-    const user = auth.currentUser;
-    if (!user) {
-      phoneError.textContent = 'شما وارد نشده‌اید.';
-      return;
-    }
-
-    const order = {
-      name,
-      phone,
-      address,
-      email: user.email,
-      timestamp: new Date().toISOString()
-    };
-
-    db.collection('orders').add(order)
-      .then(() => {
-        statusText.textContent = 'سفارش با موفقیت ثبت شد!';
-        phoneError.textContent = '';
-        document.getElementById('name').value = '';
-        document.getElementById('phone').value = '';
-        document.getElementById('address').value = '';
-      })
-      .catch((error) => {
-        statusText.textContent = 'خطا در ثبت سفارش: ' + error.message;
-      });
-  }
-
-  // نمایش سفارش‌های کاربر
-  function viewOrders() {
-    const user = auth.currentUser;
-    if (!user) return;
-
-    db.collection('orders')
-      .where('email', '==', user.email)
-      .orderBy('timestamp', 'desc')
-      .get()
-      .then((querySnapshot) => {
-        if (querySnapshot.empty) {
-          alert('هیچ سفارشی پیدا نشد.');
-          return;
-        }
-
-        let result = '';
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          result += `🧾 سفارش:\nنام: ${data.name}\nتلفن: ${data.phone}\nآدرس: ${data.address}\nزمان: ${new Date(data.timestamp).toLocaleString('fa-IR')}\n\n`;
-        });
-
-        alert(result);
-      })
-      .catch((error) => {
-        alert('خطا در دریافت سفارش‌ها: ' + error.message);
-      });
-  }
-
-  // بررسی وضعیت ورود کاربر به محض بارگذاری
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      showOrderSection();
-    } else {
-      authSection.style.display = 'block';
-      orderSection.style.display = 'none';
-    }
+// خروج کاربر
+function logout() {
+  auth.signOut().then(() => {
+    authSection.style.display = 'block';
+    orderSection.style.display = 'none';
+    adminSection.style.display = 'none';
+    clearStatus();
+    document.getElementById('email').value = '';
+    document.getElementById('password').value = '';
+    statusText.textContent = 'خروج موفقیت‌آمیز بود.';
   });
+}
 
-  // توابع را در window ثبت می‌کنیم تا HTML بتواند از آن‌ها استفاده کند
-  window.login = login;
-  window.logout = logout;
-  window.submitOrder = submitOrder;
-  window.viewOrders = viewOrders;
-})();
+// ارسال سفارش (برای کاربران عادی)
+function submitOrder() {
+  clearStatus();
+  const user = auth.currentUser;
+  if (!user) {
+    statusText.style.color = 'red';
+    statusText.textContent = 'لطفاً ابتدا وارد شوید.';
+    return;
+  }
+
+  const name = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const address = document.getElementById('address').value.trim();
+
+  if (!name || !phone || !address) {
+    statusText.style.color = 'red';
+    statusText.textContent = 'لطفاً همه فیلدها را پر کنید.';
+    return;
+  }
+
+  const orderData = {
+    userId: user.uid,
+    userEmail: user.email,
+    name,
+    phone,
+    address,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    status: 'pending' // وضعیت سفارش، مثلا pending یا completed
+  };
+
+  db.collection('orders').add(orderData)
+    .then(() => {
+      statusText.style.color = 'green';
+      statusText.textContent = 'سفارش با موفقیت ثبت شد.';
+      // پاک کردن فرم
+      document.getElementById('name').value = '';
+      document.getElementById('phone').value = '';
+      document.getElementById('address').value = '';
+    })
+    .catch(error => {
+      statusText.style.color = 'red';
+      statusText.textContent = 'خطا در ثبت سفارش: ' + error.message;
+    });
+}
+
+// دیدن سفارش‌های کاربر عادی
+function viewOrders() {
+  clearStatus();
+  const user = auth.currentUser;
+  if (!user) {
+    statusText.style.color = 'red';
+    statusText.textContent = 'لطفاً ابتدا وارد شوید.';
+    return;
+  }
+
+  db.collection('orders')
+    .where('userId', '==', user.uid)
+    .orderBy('timestamp', 'desc')
+    .get()
+    .then(snapshot => {
+      if (snapshot.empty) {
+        statusText.style.color = 'blue';
+        statusText.textContent = 'سفارشی ثبت نشده است.';
+        return;
+      }
+
+      let ordersText = 'سفارش‌های شما:\n\n';
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        ordersText += `نام: ${data.name}\nشماره تماس: ${data.phone}\nآدرس: ${data.address}\nوضعیت: ${data.status}\n\n`;
+      });
+      alert(ordersText);
+    })
+    .catch(error => {
+      statusText.style.color = 'red';
+      statusText.textContent = 'خطا در دریافت سفارش‌ها: ' + error.message;
+    });
+}
+
+// بارگذاری همه سفارش‌ها برای ادمین
+function loadAllOrders() {
+  allOrdersList.innerHTML = 'در حال بارگذاری سفارش‌ها...';
+
+  db.collection('orders')
+    .orderBy('timestamp', 'desc')
+    .get()
+    .then(snapshot => {
+      if (snapshot.empty) {
+        allOrdersList.innerHTML = 'سفارشی موجود نیست.';
+        return;
+      }
+
+      let html = '<ul style="text-align:right; direction:rtl;">';
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        html += `<li style="border-bottom:1px solid #ccc; margin-bottom:8px; padding-bottom:8px;">
+          <strong>نام:</strong> ${data.name}<br/>
+          <strong>ایمیل:</strong> ${data.userEmail}<br/>
+          <strong>شماره تماس:</strong> ${data.phone}<br/>
+          <strong>آدرس:</strong> ${data.address}<br/>
+          <strong>وضعیت:</strong> ${data.status}<br/>
+          <button onclick="updateOrderStatus('${doc.id}', 'completed')">علامت‌گذاری به عنوان تکمیل‌شده</button>
+        </li>`;
+      });
+      html += '</ul>';
+
+      allOrdersList.innerHTML = html;
+    })
+    .catch(error => {
+      allOrdersList.innerHTML = 'خطا در بارگذاری سفارش‌ها: ' + error.message;
+    });
+}
+
+// تغییر وضعیت سفارش توسط ادمین
+function updateOrderStatus(orderId, newStatus) {
+  db.collection('orders').doc(orderId).update({ status: newStatus })
+    .then(() => {
+      loadAllOrders();
+    })
+    .catch(error => {
+      alert('خطا در بروزرسانی وضعیت: ' + error.message);
+    });
+}
+
+// بررسی وضعیت ورود هنگام بارگذاری صفحه (برای حفظ لاگین)
+auth.onAuthStateChanged(user => {
+  if (user) {
+    authSection.style.display = 'none';
+
+    if (user.email === ADMIN_EMAIL) {
+      adminSection.style.display = 'block';
+      orderSection.style.display = 'none';
+      loadAllOrders();
+    } else {
+      orderSection.style.display = 'block';
+      adminSection.style.display = 'none';
+    }
+
+    statusText.style.color = 'green';
+    statusText.textContent = 'وارد شده با ایمیل: ' + user.email;
+  } else {
+    authSection.style.display = 'block';
+    orderSection.style.display = 'none';
+    adminSection.style.display = 'none';
+    clearStatus();
+  }
+});
