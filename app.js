@@ -1,9 +1,9 @@
 // === تنظیمات Firebase ===
 const firebaseConfig = {
   // اینجا تنظیمات firebase خودت را بذار
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
+  apiKey: "AIzaSyDbJwM4NRLxxgRxIPDpzV6T1wDaBjVmMtw",
+  authDomain: "mycookie-a1439.firebaseapp.com",
+  projectId: "mycookie-a1439",
   // بقیه تنظیمات
 };
 
@@ -13,7 +13,7 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 // ایمیل ادمین را اینجا وارد کن
-const ADMIN_EMAIL = "admin@example.com";
+const ADMIN_EMAIL = "holmzjack@gmail.com";
 
 // === المان‌های صفحه ===
 const authSection = document.getElementById("auth-section");
