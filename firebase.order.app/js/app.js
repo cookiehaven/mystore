@@ -1,4 +1,4 @@
-const adminUID = "ADMIN_FIREBASE_UID"; // این مقدار را از Firebase بگیرید
+const adminUID = "Vuw3WMJA3Vhrp5OpudAO40FtmbP2"; // این مقدار را از Firebase بگیرید
 
 function login() {
   const email = document.getElementById("email").value;
