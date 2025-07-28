@@ -18,9 +18,9 @@
     <input type="text" id="search-input" placeholder="جست‌وجو..." onkeyup="searchProducts()" />
     <div id="filter-buttons">
       <button onclick="filterProducts('all')">همه</button>
-      <button onclick="filterProducts('cookie')">کوکی ها</button>
-      <button onclick="filterProducts('cake')">کیک ها</button>
-      <button onclick="filterProducts('cheesecake')">چیزکیک ها</button>
+      <button onclick="filterProducts('cookie')">کوکی‌ها</button>
+      <button onclick="filterProducts('cake')">کیک‌ها</button>
+      <button onclick="filterProducts('cheesecake')">چیزکیک‌ها</button>
     </div>
   </section>
 
@@ -28,22 +28,28 @@
 
   <h1>سفارش آنلاین کیک</h1>
 
+  <!-- ورود / ثبت‌نام -->
   <div id="auth-section">
-    <input id="email" type="email" placeholder="ایمیل">
-    <input id="password" type="password" placeholder="رمز عبور">
-    <button onclick="login()">ورود / ثبت‌نام</button>
+    <input id="email" type="email" placeholder="ایمیل" />
+    <input id="password" type="password" placeholder="رمز عبور" />
+    <button id="login-btn">ورود / ثبت‌نام</button>
+    <p id="auth-status" style="color:red; margin-top:0.5rem;"></p>
   </div>
 
+  <!-- فرم سفارش -->
   <div id="order-section" style="display:none;">
     <h2>فرم سفارش</h2>
-    <input id="name" placeholder="نام">
-    <input id="phone" placeholder="شماره تماس">
+    <input id="name" placeholder="نام" />
+    <input id="phone" placeholder="شماره تماس" />
     <textarea id="address" placeholder="آدرس"></textarea>
-    <button onclick="submitOrder()">ارسال سفارش</button>
-    <button onclick="viewOrders()">دیدن سفارش‌های من</button>
-    <button onclick="logout()">خروج</button>
+    <button id="submit-order-btn">ارسال سفارش</button>
+    <button id="view-orders-btn">دیدن سفارش‌های من</button>
+    <button id="logout-btn">خروج</button>
+    <p id="order-status" style="color:green;"></p>
+    <p id="phone-error" style="color:red;"></p>
   </div>
 
+  <!-- پیش‌نمایش سفارش -->
   <div id="order-preview-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); align-items:center; justify-content:center;">
     <div style="background:#fff; padding:1rem; border-radius:10px; max-width:400px; width:90%; text-align:right; direction:rtl;">
       <pre id="order-preview-text" style="white-space: pre-wrap;"></pre>
@@ -52,19 +58,17 @@
     </div>
   </div>
 
+  <!-- اطلاعات پرداخت -->
   <section id="payment-info-section" style="display:none;">
     <h3>اطلاعات پرداخت</h3>
     <form id="payment-form">
       <input type="text" id="payment-amount" placeholder="مبلغ واریزی (تومان)" />
-      <input type="date" id="payment-date" placeholder="تاریخ واریز" />
+      <input type="date" id="payment-date" />
       <input type="text" id="payment-tracking" placeholder="کد پیگیری" />
       <button type="submit">ارسال اطلاعات پرداخت</button>
     </form>
     <p id="payment-status" style="color:red;"></p>
   </section>
-
-  <p id="status" style="color:green;"></p>
-  <p id="phone-error" style="color:red;"></p>
 
   <main id="product-list"></main>
 
@@ -81,16 +85,110 @@
     </div>
   </footer>
 
-  <!-- Firebase SDKs -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
-  <!-- اسکریپت‌ها (در صورتی که همه در روت هستند) -->
+  <!-- فایل‌های جاوااسکریپت -->
   <script src="firebase-config.js"></script>
   <script src="products.js"></script>
   <script src="cart.js"></script>
   <script src="send-to-telegram.js"></script>
-  <script src="app.js"></script>
+
+  <!-- ورود و مدیریت فرم سفارش -->
+  <script>
+    const auth = firebase.auth();
+
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const loginBtn = document.getElementById("login-btn");
+    const logoutBtn = document.getElementById("logout-btn");
+    const authStatus = document.getElementById("auth-status");
+
+    const authSection = document.getElementById("auth-section");
+    const orderSection = document.getElementById("order-section");
+
+    const phoneInput = document.getElementById("phone");
+    const phoneError = document.getElementById("phone-error");
+    const orderStatus = document.getElementById("order-status");
+
+    const orderPreviewModal = document.getElementById("order-preview-modal");
+    const orderPreviewText = document.getElementById("order-preview-text");
+    const confirmOrderBtn = document.getElementById("confirm-order-btn");
+    const cancelOrderBtn = document.getElementById("cancel-order-btn");
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        authSection.style.display = "none";
+        orderSection.style.display = "block";
+        authStatus.textContent = "";
+      } else {
+        authSection.style.display = "block";
+        orderSection.style.display = "none";
+      }
+    });
+
+    loginBtn.onclick = async () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+      if (!email || !password) {
+        authStatus.textContent = "ایمیل و رمز عبور را وارد کنید.";
+        return;
+      }
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        authStatus.textContent = "";
+      } catch (err) {
+        if (err.code === "auth/user-not-found") {
+          try {
+            await auth.createUserWithEmailAndPassword(email, password);
+            authStatus.style.color = "green";
+            authStatus.textContent = "ثبت نام موفقیت‌آمیز بود.";
+          } catch (e) {
+            authStatus.textContent = e.message;
+          }
+        } else {
+          authStatus.textContent = err.message;
+        }
+      }
+    };
+
+    logoutBtn.onclick = () => {
+      auth.signOut();
+    };
+
+    // شماره موبایل
+    phoneInput.addEventListener("input", () => {
+      const regex = /^09\d{9}$/;
+      const phone = phoneInput.value.trim();
+      phoneError.textContent = regex.test(phone) ? "" : "شماره موبایل نادرست است.";
+    });
+
+    // ارسال سفارش
+    document.getElementById("submit-order-btn").onclick = () => {
+      const name = document.getElementById("name").value.trim();
+      const phone = phoneInput.value.trim();
+      const address = document.getElementById("address").value.trim();
+
+      if (!name || !phone || !address) {
+        orderStatus.textContent = "لطفاً همه فیلدها را پر کنید.";
+        return;
+      }
+
+      orderPreviewText.textContent = `نام: ${name}\nشماره: ${phone}\nآدرس: ${address}`;
+      orderPreviewModal.style.display = "flex";
+    };
+
+    confirmOrderBtn.onclick = () => {
+      orderPreviewModal.style.display = "none";
+      orderStatus.textContent = "سفارش با موفقیت ثبت شد.";
+      // اینجا می‌تونی ذخیره یا ارسال به تلگرام انجام بدی
+    };
+
+    cancelOrderBtn.onclick = () => {
+      orderPreviewModal.style.display = "none";
+    };
+  </script>
 </body>
 </html>
