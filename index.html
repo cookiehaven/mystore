@@ -30,14 +30,9 @@
   </section>
   
   <a class="cart-link" href="cart.html">🛒 مشاهده سبد خرید</a>
-  <title>ثبت سفارش</title>
-  <link rel="stylesheet" href="css/style.css">
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-</head>
-<body>
+
   <h1>سفارش آنلاین کیک</h1>
+  
   <div id="auth-section">
     <input id="email" type="email" placeholder="ایمیل">
     <input id="password" type="password" placeholder="رمز عبور">
@@ -48,14 +43,33 @@
     <h2>فرم سفارش</h2>
     <input id="name" placeholder="نام">
     <input id="phone" placeholder="شماره تماس">
-    <textarea id="items" placeholder="مثلاً: چیزکیک - ۲ عدد"></textarea>
+    <textarea id="address" placeholder="آدرس"></textarea>
     <button onclick="submitOrder()">ارسال سفارش</button>
     <button onclick="viewOrders()">دیدن سفارش‌های من</button>
     <button onclick="logout()">خروج</button>
   </div>
 
-  <script src="js/firebase-config.js"></script>
-  <script src="js/app.js"></script>
+  <div id="order-preview-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); align-items:center; justify-content:center;">
+    <div style="background:#fff; padding:1rem; border-radius:10px; max-width:400px; width:90%; text-align:right; direction:rtl;">
+      <pre id="order-preview-text" style="white-space: pre-wrap;"></pre>
+      <button id="confirm-order-btn">تایید سفارش</button>
+      <button id="cancel-order-btn">لغو سفارش</button>
+    </div>
+  </div>
+
+  <section id="payment-info-section" style="display:none;">
+    <h3>اطلاعات پرداخت</h3>
+    <form id="payment-form">
+      <input type="text" id="payment-amount" placeholder="مبلغ واریزی (تومان)" />
+      <input type="date" id="payment-date" placeholder="تاریخ واریز" />
+      <input type="text" id="payment-tracking" placeholder="کد پیگیری" />
+      <button type="submit">ارسال اطلاعات پرداخت</button>
+    </form>
+    <p id="payment-status" style="color:red;"></p>
+  </section>
+
+  <p id="status" style="color:green;"></p>
+  <p id="phone-error" style="color:red;"></p>
 
   <main id="product-list"></main>
 
@@ -72,7 +86,14 @@
     </div>
   </footer>
 
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+  <script src="js/firebase-config.js"></script>
   <script src="products.js"></script>
   <script src="cart.js"></script>
+  <script src="send-to-telegram.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
