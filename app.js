@@ -1,19 +1,16 @@
-// فرض بر این است که firebase-config.js قبلاً لود شده و
-// ثابت‌های auth و db تعریف شده‌اند
+// فرض بر این است که firebase-config.js قبلاً بارگذاری شده و auth و db تعریف شده‌اند
 
+// انتخاب عناصر
 const authSection = document.getElementById("auth-section");
 const orderSection = document.getElementById("order-section");
 
+// نمایش یا پنهان کردن بخش سفارش
 function showOrderSection(show) {
-  if (show) {
-    authSection.style.display = "none";
-    orderSection.style.display = "block";
-  } else {
-    authSection.style.display = "block";
-    orderSection.style.display = "none";
-  }
+  authSection.style.display = show ? "none" : "block";
+  orderSection.style.display = show ? "block" : "none";
 }
 
+// ورود یا ثبت‌نام
 async function login() {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
@@ -40,20 +37,19 @@ async function login() {
   }
 }
 
+// خروج
 function logout() {
   auth.signOut().then(() => {
-    alert("خروج انجام شد.");
+    alert("خارج شدید.");
   });
 }
 
+// بررسی وضعیت کاربر هنگام تغییر
 auth.onAuthStateChanged(user => {
-  if (user) {
-    showOrderSection(true);
-  } else {
-    showOrderSection(false);
-  }
+  showOrderSection(!!user);
 });
 
+// ارسال سفارش
 async function submitOrder() {
   const user = auth.currentUser;
   if (!user) {
@@ -65,8 +61,11 @@ async function submitOrder() {
   const phone = document.getElementById("phone").value.trim();
   const address = document.getElementById("address").value.trim();
 
-  if (!name || !phone || !address) {
-    alert("لطفاً تمام فیلدها (نام، شماره، آدرس) را وارد کنید.");
+  const cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
+  const itemsText = cartItems.map(item => `- ${item.name} (x${item.quantity})`).join("\n");
+
+  if (!name || !phone || !address || cartItems.length === 0) {
+    alert("لطفاً تمام فیلدها را پر کنید و سبد خرید نباید خالی باشد.");
     return;
   }
 
@@ -76,28 +75,30 @@ async function submitOrder() {
     name,
     phone,
     address,
+    items: itemsText,
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
   };
 
   try {
     await db.collection("orders").add(orderData);
-    alert("سفارش شما ثبت شد.");
+    alert("سفارش شما با موفقیت ثبت شد.");
 
-    // پاک کردن فرم
+    // تلاش برای ارسال به تلگرام (در صورت فعال بودن)
+    if (typeof sendToTelegram === "function" && window.telegramEnabled !== false) {
+      sendToTelegram(orderData);
+    }
+
+    // پاک کردن فرم و سبد خرید
     document.getElementById("name").value = "";
     document.getElementById("phone").value = "";
     document.getElementById("address").value = "";
-
-    // ارسال به تلگرام (اختیاری اگر فایل send-to-telegram.js موجود باشد)
-    if (typeof sendOrderToTelegram === "function") {
-      sendOrderToTelegram(orderData);
-    }
-
+    localStorage.removeItem("cart");
   } catch (error) {
     alert("خطا در ثبت سفارش: " + error.message);
   }
 }
 
+// مشاهده سفارش‌های ثبت‌شده
 async function viewOrders() {
   const user = auth.currentUser;
   if (!user) {
@@ -106,31 +107,30 @@ async function viewOrders() {
   }
 
   try {
-    const querySnapshot = await db.collection("orders")
+    const snapshot = await db.collection("orders")
       .where("uid", "==", user.uid)
       .orderBy("createdAt", "desc")
       .get();
 
-    if (querySnapshot.empty) {
+    if (snapshot.empty) {
       alert("شما هنوز سفارشی ثبت نکرده‌اید.");
       return;
     }
 
     let ordersText = "سفارش‌های شما:\n\n";
-    querySnapshot.forEach(doc => {
+    snapshot.forEach(doc => {
       const data = doc.data();
       const date = data.createdAt ? data.createdAt.toDate().toLocaleString("fa-IR") : "تاریخ نامشخص";
-      ordersText += `- تاریخ: ${date}\n  نام: ${data.name}\n  شماره تماس: ${data.phone}\n  آدرس: ${data.address}\n\n`;
+      ordersText += `📅 تاریخ: ${date}\n👤 نام: ${data.name}\n📞 تلفن: ${data.phone}\n📦 آدرس: ${data.address}\n🧾 موارد:\n${data.items}\n\n`;
     });
 
     alert(ordersText);
-
   } catch (error) {
     alert("خطا در دریافت سفارش‌ها: " + error.message);
   }
 }
 
-// اضافه کردن توابع به window برای در دسترس بودن از HTML
+// ثبت توابع در window برای HTML
 window.login = login;
 window.logout = logout;
 window.submitOrder = submitOrder;
