@@ -1,52 +1,53 @@
-// app.js
+// فرض بر این است که firebase-config.js قبلا لود شده و
+// ثابت‌های auth و db تعریف شده‌اند
 
-function login() {
+// ————— مدیریت ورود/ثبت‌نام —————
+
+const authSection = document.getElementById("auth-section");
+const orderSection = document.getElementById("order-section");
+
+function showOrderSection(show) {
+  if (show) {
+    authSection.style.display = "none";
+    orderSection.style.display = "block";
+  } else {
+    authSection.style.display = "block";
+    orderSection.style.display = "none";
+  }
+}
+
+async function login() {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
 
   if (!email || !password) {
-    alert("لطفا ایمیل و رمز عبور را وارد کنید");
+    alert("لطفاً ایمیل و رمز عبور را وارد کنید.");
     return;
   }
 
-  auth.signInWithEmailAndPassword(email, password)
-    .then(userCredential => {
-      alert("ورود موفقیت‌آمیز بود");
-      showOrderSection(true);
-    })
-    .catch(error => {
-      if (error.code === "auth/user-not-found") {
-        // اگر کاربر پیدا نشد، ثبت نام کن
-        auth.createUserWithEmailAndPassword(email, password)
-          .then(userCredential => {
-            alert("ثبت‌نام با موفقیت انجام شد");
-            showOrderSection(true);
-          })
-          .catch(err => {
-            alert("خطا در ثبت‌نام: " + err.message);
-          });
-      } else {
-        alert("خطا در ورود: " + error.message);
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+    alert("ورود موفقیت‌آمیز بود!");
+  } catch (error) {
+    if (error.code === "auth/user-not-found") {
+      // اگر کاربری نبود، ثبت‌نام کن
+      try {
+        await auth.createUserWithEmailAndPassword(email, password);
+        alert("ثبت‌نام موفقیت‌آمیز بود و وارد شدید.");
+      } catch (regError) {
+        alert("خطا در ثبت‌نام: " + regError.message);
       }
-    });
+    } else {
+      alert("خطا در ورود: " + error.message);
+    }
+  }
 }
 
 function logout() {
-  auth.signOut().then(() => {
-    alert("شما از حساب کاربری خارج شدید");
-    showOrderSection(false);
-  });
+  auth.signOut();
 }
 
-function showOrderSection(show) {
-  document.getElementById("auth-section").style.display = show ? "none" : "block";
-  document.getElementById("order-section").style.display = show ? "block" : "none";
-}
-
-window.login = login;
-window.logout = logout;
-
-// بررسی وضعیت کاربر هنگام بارگذاری صفحه
+// نمایش یا مخفی کردن فرم سفارش بر اساس وضعیت کاربر
 auth.onAuthStateChanged(user => {
   if (user) {
     showOrderSection(true);
@@ -54,3 +55,80 @@ auth.onAuthStateChanged(user => {
     showOrderSection(false);
   }
 });
+
+// ————— مدیریت سفارشات —————
+
+async function submitOrder() {
+  const user = auth.currentUser;
+  if (!user) {
+    alert("لطفاً ابتدا وارد شوید.");
+    return;
+  }
+
+  const name = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const itemsText = document.getElementById("items").value.trim();
+
+  if (!name || !phone || !itemsText) {
+    alert("لطفاً تمام فیلدها را پر کنید.");
+    return;
+  }
+
+  const orderData = {
+    uid: user.uid,
+    email: user.email,
+    name,
+    phone,
+    items: itemsText,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+  };
+
+  try {
+    await db.collection("orders").add(orderData);
+    alert("سفارش شما ثبت شد.");
+    // پاک کردن فرم
+    document.getElementById("name").value = "";
+    document.getElementById("phone").value = "";
+    document.getElementById("items").value = "";
+  } catch (error) {
+    alert("خطا در ثبت سفارش: " + error.message);
+  }
+}
+
+async function viewOrders() {
+  const user = auth.currentUser;
+  if (!user) {
+    alert("لطفاً ابتدا وارد شوید.");
+    return;
+  }
+
+  try {
+    const querySnapshot = await db.collection("orders")
+      .where("uid", "==", user.uid)
+      .orderBy("createdAt", "desc")
+      .get();
+
+    if (querySnapshot.empty) {
+      alert("شما هنوز سفارشی ثبت نکرده‌اید.");
+      return;
+    }
+
+    let ordersText = "سفارش‌های شما:\n\n";
+    querySnapshot.forEach(doc => {
+      const data = doc.data();
+      const date = data.createdAt ? data.createdAt.toDate().toLocaleString("fa-IR") : "تاریخ نامشخص";
+      ordersText += `- تاریخ: ${date}\n  نام: ${data.name}\n  شماره تماس: ${data.phone}\n  موارد: ${data.items}\n\n`;
+    });
+
+    alert(ordersText);
+
+  } catch (error) {
+    alert("خطا در دریافت سفارش‌ها: " + error.message);
+  }
+}
+
+// اضافه کردن توابع به window برای دسترسی در HTML
+window.login = login;
+window.logout = logout;
+window.submitOrder = submitOrder;
+window.viewOrders = viewOrders;
