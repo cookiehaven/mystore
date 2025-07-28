@@ -2,10 +2,11 @@
 <html lang="fa">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Cookie Haven</title>
   <link rel="shortcut icon" href="images/favicon.png" type="image/png" />
-  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
+  <link rel="icon" href="images/favicon.png" type="image/png" />
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@30.1.0/dist/font-face.css" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -13,75 +14,42 @@
     <h1><a href="index.html">🍪 Cookie Haven</a></h1>
   </header>
 
-  <section id="filter-search-container">
-    <input type="text" id="search-input" placeholder="جست‌وجو..." onkeyup="searchProducts()" />
-    <div id="filter-buttons">
-      <button onclick="filterProducts('all')">همه</button>
-      <button onclick="filterProducts('cookie')">کوکی ها</button>
-      <button onclick="filterProducts('cake')">کیک ها</button>
-      <button onclick="filterProducts('cheesecake')">چیزکیک ها</button>
-    </div>
-  </section>
-
-  <a class="cart-link" href="cart.html">🛒 مشاهده سبد خرید</a>
-
-  <h1>سفارش آنلاین کیک</h1>
-
-  <!-- بخش ورود و ثبت‌نام -->
   <div id="auth-section">
     <input id="email" type="email" placeholder="ایمیل" />
     <input id="password" type="password" placeholder="رمز عبور" />
-    <button onclick="login()">ورود</button>
     <button onclick="signup()">ثبت‌نام</button>
-    <p id="auth-status" style="color:red; margin-top:10px;"></p>
+    <button onclick="login()">ورود</button>
   </div>
 
-  <!-- بخش سفارش برای کاربران عادی -->
   <div id="order-section" style="display:none;">
     <h2>فرم سفارش</h2>
     <input id="name" placeholder="نام" />
     <input id="phone" placeholder="شماره تماس" />
     <textarea id="address" placeholder="آدرس"></textarea>
     <button onclick="submitOrder()">ارسال سفارش</button>
-    <button onclick="viewOrders()">دیدن سفارش‌های من</button>
     <button onclick="logout()">خروج</button>
-  </div>
-
-  <!-- بخش مدیریت سفارش‌ها برای ادمین -->
-  <div id="admin-section" style="display:none;">
-    <h2>مدیریت سفارش‌ها (ویژه ادمین)</h2>
-    <button onclick="viewAllOrders()">مشاهده همه سفارش‌ها</button>
-    <button onclick="logout()">خروج</button>
-    <div id="all-orders-list"></div>
   </div>
 
   <p id="status" style="color:green;"></p>
-
-  <main id="product-list"></main>
+  <p id="phone-error" style="color:red;"></p>
 
   <footer>
     <div id="contact-links">
-      <a href="https://t.me/ali_aliama" target="_blank" rel="noopener noreferrer">
-        <img src="images/telegram.png" alt="تلگرام" width="24" height="24" style="vertical-align:middle;" />
-        تلگرام
-      </a> |
-      <a href="https://www.instagram.com/cookiie_haven" target="_blank" rel="noopener noreferrer">
-        <img src="images/instagram.png" alt="اینستاگرام" width="24" height="24" style="vertical-align:middle;" />
-        اینستاگرام
+      <a href="https://t.me/ali_aliama" target="_blank">
+        <img src="images/telegram.png" width="24" height="24" /> تلگرام
+      </a>
+      |
+      <a href="https://www.instagram.com/cookiie_haven" target="_blank">
+        <img src="images/instagram.png" width="24" height="24" /> اینستاگرام
       </a>
     </div>
   </footer>
 
-  <!-- Firebase SDKs -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
-  <!-- فایل‌های اسکریپت -->
-  <script src="firebase-config.js"></script>
-  <script src="products.js"></script>
-  <script src="cart.js"></script>
-  <script src="send-to-telegram.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
