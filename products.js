@@ -47,6 +47,5 @@ document.addEventListener("DOMContentLoaded", () => {
   renderProducts(products);
 });
 
-// اضافه کردن توابع به window برای دسترسی در HTML
 window.filterProducts = filterProducts;
 window.searchProducts = searchProducts;
