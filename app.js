@@ -1,4 +1,4 @@
-// فرض بر این است که firebase-config.js قبلا لود شده و
+// فرض بر این است که firebase-config.js قبلاً لود شده و
 // ثابت‌های auth و db تعریف شده‌اند
 
 const authSection = document.getElementById("auth-section");
@@ -41,10 +41,11 @@ async function login() {
 }
 
 function logout() {
-  auth.signOut();
+  auth.signOut().then(() => {
+    alert("خروج انجام شد.");
+  });
 }
 
-// نمایش یا مخفی کردن فرم سفارش بر اساس وضعیت کاربر
 auth.onAuthStateChanged(user => {
   if (user) {
     showOrderSection(true);
@@ -63,10 +64,9 @@ async function submitOrder() {
   const name = document.getElementById("name").value.trim();
   const phone = document.getElementById("phone").value.trim();
   const address = document.getElementById("address").value.trim();
-  const itemsText = document.getElementById("items").value.trim();
 
-  if (!name || !phone || !address || !itemsText) {
-    alert("لطفاً تمام فیلدها را پر کنید.");
+  if (!name || !phone || !address) {
+    alert("لطفاً تمام فیلدها (نام، شماره، آدرس) را وارد کنید.");
     return;
   }
 
@@ -76,18 +76,23 @@ async function submitOrder() {
     name,
     phone,
     address,
-    items: itemsText,
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
   };
 
   try {
     await db.collection("orders").add(orderData);
     alert("سفارش شما ثبت شد.");
+
     // پاک کردن فرم
     document.getElementById("name").value = "";
     document.getElementById("phone").value = "";
     document.getElementById("address").value = "";
-    document.getElementById("items").value = "";
+
+    // ارسال به تلگرام (اختیاری اگر فایل send-to-telegram.js موجود باشد)
+    if (typeof sendOrderToTelegram === "function") {
+      sendOrderToTelegram(orderData);
+    }
+
   } catch (error) {
     alert("خطا در ثبت سفارش: " + error.message);
   }
@@ -115,7 +120,7 @@ async function viewOrders() {
     querySnapshot.forEach(doc => {
       const data = doc.data();
       const date = data.createdAt ? data.createdAt.toDate().toLocaleString("fa-IR") : "تاریخ نامشخص";
-      ordersText += `- تاریخ: ${date}\n  نام: ${data.name}\n  شماره تماس: ${data.phone}\n  آدرس: ${data.address}\n  موارد: ${data.items}\n\n`;
+      ordersText += `- تاریخ: ${date}\n  نام: ${data.name}\n  شماره تماس: ${data.phone}\n  آدرس: ${data.address}\n\n`;
     });
 
     alert(ordersText);
@@ -125,6 +130,7 @@ async function viewOrders() {
   }
 }
 
+// اضافه کردن توابع به window برای در دسترس بودن از HTML
 window.login = login;
 window.logout = logout;
 window.submitOrder = submitOrder;
