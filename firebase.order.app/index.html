@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>ثبت سفارش</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <h1>سفارش آنلاین کیک</h1>
+  <div id="auth-section">
+    <input id="email" type="email" placeholder="ایمیل">
+    <input id="password" type="password" placeholder="رمز عبور">
+    <button onclick="login()">ورود / ثبت‌نام</button>
+  </div>
+
+  <div id="order-section" style="display:none;">
+    <h2>فرم سفارش</h2>
+    <input id="name" placeholder="نام">
+    <input id="phone" placeholder="شماره تماس">
+    <textarea id="items" placeholder="مثلاً: چیزکیک - ۲ عدد"></textarea>
+    <button onclick="submitOrder()">ارسال سفارش</button>
+    <button onclick="viewOrders()">دیدن سفارش‌های من</button>
+    <button onclick="logout()">خروج</button>
+  </div>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
