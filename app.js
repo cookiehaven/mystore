@@ -1,46 +1,6 @@
-// فرض بر اینه که فایل firebase-config.js قبلاً لود شده و شامل firebase.initializeApp و تعریف auth, db هست
-
-// DOM refs
-const authSection = document.getElementById("auth-section");
-const welcomeSection = document.getElementById("welcome-section");
-const welcomeMessage = document.getElementById("welcome-message");
-const orderSection = document.getElementById("order-section");
-const statusText = document.getElementById("status");
-
-// Signup
-function signup() {
-  const email = document.getElementById("email").value;
-  const pass = document.getElementById("password").value;
-  auth.createUserWithEmailAndPassword(email, pass)
-    .then(() => {
-      statusText.textContent = "ثبت‌نام موفقیت‌آمیز بود.";
-    })
-    .catch(err => {
-      statusText.textContent = "خطا در ثبت‌نام: " + err.message;
-    });
-}
-
-// Login
-function login() {
-  const email = document.getElementById("email").value;
-  const pass = document.getElementById("password").value;
-  auth.signInWithEmailAndPassword(email, pass)
-    .then(user => {
-      statusText.textContent = "ورود موفقیت‌آمیز بود.";
-    })
-    .catch(err => {
-      statusText.textContent = "خطا در ورود: " + err.message;
-    });
-}
-
-// Logout
-function logout() {
-  auth.signOut();
-}
-
-// فرم سفارش رو فقط بعد لاگین و با دکمه نشون بده
+// نمایش فرم سفارش فقط پس از ورود
 function toggleOrderForm() {
-  orderSection.style.display = "block";
+  document.getElementById("order-section").style.display = "block";
 }
 
 // ثبت سفارش
@@ -49,6 +9,7 @@ function submitOrder() {
   const phone = document.getElementById("phone").value;
   const address = document.getElementById("address").value;
   const user = auth.currentUser;
+  const statusText = document.getElementById("status");
 
   if (!user) {
     statusText.textContent = "ابتدا وارد شوید.";
@@ -63,7 +24,7 @@ function submitOrder() {
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   }).then(() => {
     statusText.textContent = "سفارش ثبت شد!";
-    orderSection.style.display = "none";
+    document.getElementById("order-section").style.display = "none";
   }).catch(err => {
     statusText.textContent = "خطا در ثبت سفارش: " + err.message;
   });
@@ -71,21 +32,50 @@ function submitOrder() {
 
 // بررسی وضعیت ورود کاربر
 auth.onAuthStateChanged(user => {
+  const authSection = document.getElementById("auth-section");
+  const welcomeSection = document.getElementById("welcome-section");
+  const welcomeMessage = document.getElementById("welcome-message");
+
   if (user) {
     authSection.style.display = "none";
     welcomeSection.style.display = "block";
-    welcomeMessage.textContent = `سلام ${user.email}! خوش آمدید.`;
+    welcomeMessage.textContent = `خوش آمدید، ${user.email}`;
   } else {
     authSection.style.display = "block";
     welcomeSection.style.display = "none";
-    orderSection.style.display = "none";
+    document.getElementById("order-section").style.display = "none";
     welcomeMessage.textContent = "";
   }
 });
 
-// فعال کردن توابع برای HTML
+// ثبت‌نام
+function signup() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(() => location.reload())
+    .catch(err => alert(err.message));
+}
+
+// ورود
+function login() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  auth.signInWithEmailAndPassword(email, password)
+    .then(() => location.reload())
+    .catch(err => alert(err.message));
+}
+
+// خروج
+function logout() {
+  auth.signOut().then(() => location.reload());
+}
+
+// دسترسی توابع در HTML
 window.signup = signup;
 window.login = login;
 window.logout = logout;
-window.submitOrder = submitOrder;
 window.toggleOrderForm = toggleOrderForm;
+window.submitOrder = submitOrder;
