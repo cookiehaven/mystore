@@ -1,3 +1,6 @@
+const auth = firebase.auth();
+const db = firebase.firestore();
+
 function getCart() {
   return JSON.parse(localStorage.getItem("cart") || "[]");
 }
@@ -28,7 +31,6 @@ function updateQty(id, change) {
   cart[itemIndex].qty += change;
 
   if (cart[itemIndex].qty < 1) {
-    // حذف محصول اگر تعداد به صفر رسید
     cart.splice(itemIndex, 1);
   }
 
@@ -63,5 +65,43 @@ function renderCart() {
 
   container.innerHTML += `<hr><div><strong>جمع کل: ${total.toLocaleString()} تومان</strong></div>`;
 }
+
+document.getElementById("order-form").addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const user = auth.currentUser;
+  if (!user) {
+    document.getElementById("status").textContent = "لطفاً ابتدا وارد شوید.";
+    return;
+  }
+
+  const cart = getCart();
+  if (cart.length === 0) {
+    document.getElementById("status").textContent = "سبد خرید خالی است.";
+    return;
+  }
+
+  const name = document.getElementById("name").value;
+  const phone = document.getElementById("phone").value;
+  const address = document.getElementById("address").value;
+
+  try {
+    await db.collection("orders").add({
+      uid: user.uid,
+      name,
+      phone,
+      address,
+      cart,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    document.getElementById("status").textContent = "سفارش ثبت شد!";
+    localStorage.removeItem("cart");
+    renderCart();
+    this.reset();
+  } catch (err) {
+    document.getElementById("status").textContent = "خطا در ثبت سفارش: " + err.message;
+  }
+});
 
 renderCart();
