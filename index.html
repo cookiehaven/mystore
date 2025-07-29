@@ -23,9 +23,6 @@
     </div>
   </section>
 
-  <a class="cart-link" href="cart.html">🛒 مشاهده سبد خرید</a>
-  <a class="cart-link" href="order-history.html">📦 سفارش‌های من</a>
-
   <div id="auth-section">
     <input id="email" type="email" placeholder="ایمیل">
     <input id="password" type="password" placeholder="رمز عبور">
@@ -35,16 +32,9 @@
 
   <div id="welcome-section" style="display:none;">
     <p id="welcome-message"></p>
+    <a class="cart-link" href="cart.html">🛒 مشاهده سبد خرید</a>
+    <a class="cart-link" href="order-history.html">📦 سفارش‌های من</a>
     <button onclick="logout()">خروج</button>
-    <button onclick="toggleOrderForm()">فرم سفارش</button>
-  </div>
-
-  <div id="order-section" style="display:none;">
-    <h2>فرم سفارش</h2>
-    <input id="name" placeholder="نام">
-    <input id="phone" placeholder="شماره تماس">
-    <textarea id="address" placeholder="آدرس"></textarea>
-    <button onclick="submitOrder()">ارسال سفارش</button>
   </div>
 
   <p id="status" style="color:green;"></p>
@@ -72,7 +62,8 @@
 
   <!-- اسکریپت‌ها -->
   <script src="firebase-config.js"></script>
-  <script src="products.js"></script> <!-- این خط برای نمایش محصولات ضروری است -->
+  <script src="products.js"></script>
+  <script src="cart.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
