@@ -24,6 +24,7 @@
   </section>
 
   <a class="cart-link" href="cart.html">🛒 مشاهده سبد خرید</a>
+  <a class="cart-link" href="order-history.html">📦 سفارش‌های من</a>
 
   <div id="auth-section">
     <input id="email" type="email" placeholder="ایمیل">
@@ -67,7 +68,42 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
+  <!-- Firebase Config -->
+  <script src="js/firebase-config.js"></script>
+
   <!-- Scripts -->
   <script src="app.js"></script>
+  <script>
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+
+    function signup() {
+      const email = emailInput.value;
+      const password = passwordInput.value;
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(() => location.reload())
+        .catch(err => alert(err.message));
+    }
+
+    function login() {
+      const email = emailInput.value;
+      const password = passwordInput.value;
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => location.reload())
+        .catch(err => alert(err.message));
+    }
+
+    function logout() {
+      auth.signOut().then(() => location.reload());
+    }
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById("auth-section").style.display = "none";
+        document.getElementById("welcome-section").style.display = "block";
+        document.getElementById("welcome-message").innerText = `خوش آمدید، ${user.email}`;
+      }
+    });
+  </script>
 </body>
 </html>
