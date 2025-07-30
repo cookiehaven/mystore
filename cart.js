@@ -1,4 +1,10 @@
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let currentUser = null;
+
+// دریافت کاربر واردشده
+firebase.auth().onAuthStateChanged(user => {
+  currentUser = user;
+});
 
 function saveCart() {
   localStorage.setItem("cart", JSON.stringify(cart));
@@ -62,7 +68,7 @@ function addToCart(product) {
     cart.push({ ...product });
   }
   saveCart();
-  renderCartItems(); // نمایش لحظه‌ای در صورت لزوم
+  renderCartItems();
   alert(`${product.name} به سبد خرید افزوده شد.`);
 }
 
@@ -74,12 +80,11 @@ document.addEventListener("DOMContentLoaded", () => {
     orderForm.addEventListener("submit", e => {
       e.preventDefault();
 
-      const name = document.getElementById("name").value;
-      const phone = document.getElementById("phone").value;
-      const address = document.getElementById("address").value;
-      const user = firebase.auth().currentUser;
+      const name = document.getElementById("name").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const address = document.getElementById("address").value.trim();
 
-      if (!user) {
+      if (!currentUser) {
         document.getElementById("status").textContent = "ابتدا وارد شوید.";
         return;
       }
@@ -98,11 +103,13 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("order-preview-text").textContent =
         `سفارش‌دهنده: ${name}\nموبایل: ${phone}\nآدرس: ${address}\n\nاقلام سفارش:\n${orderText}\n\n💰 مبلغ کل: ${total.toLocaleString()} تومان`;
 
+      // نمایش مدال پیش‌نمایش
       document.getElementById("order-preview-modal").style.display = "flex";
 
+      // دکمه تایید سفارش
       document.getElementById("confirm-order-btn").onclick = () => {
         firebase.firestore().collection("orders").add({
-          uid: user.uid,
+          uid: currentUser.uid,
           name,
           phone,
           address,
@@ -122,6 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       };
 
+      // دکمه لغو سفارش
       document.getElementById("cancel-order-btn").onclick = () => {
         document.getElementById("order-preview-modal").style.display = "none";
       };
