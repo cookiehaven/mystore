@@ -23,6 +23,13 @@
     </div>
   </section>
 
+  <!-- لینک‌های سبد خرید و سفارش‌ها -->
+  <div id="nav-links">
+    <a class="cart-link" href="cart.html">🛒 مشاهده سبد خرید</a>
+    <a class="cart-link" id="order-history-link" style="display:none;" href="order-history.html">📦 سفارش‌های من</a>
+  </div>
+
+  <!-- فرم ورود / ثبت‌نام -->
   <div id="auth-section">
     <input id="email" type="email" placeholder="ایمیل">
     <input id="password" type="password" placeholder="رمز عبور">
@@ -30,16 +37,15 @@
     <button onclick="login()">ورود</button>
   </div>
 
+  <!-- بخش خوش‌آمدگویی بعد از ورود -->
   <div id="welcome-section" style="display:none;">
     <p id="welcome-message"></p>
-    <a class="cart-link" href="cart.html">🛒 مشاهده سبد خرید</a>
-    <a class="cart-link" href="order-history.html">📦 سفارش‌های من</a>
     <button onclick="logout()">خروج</button>
   </div>
 
   <p id="status" style="color:green;"></p>
 
-  <!-- محل نمایش محصولات -->
+  <!-- لیست محصولات -->
   <main id="product-list"></main>
 
   <footer>
@@ -60,10 +66,24 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
-  <!-- اسکریپت‌ها -->
+  <!-- Firebase Config -->
   <script src="firebase-config.js"></script>
-  <script src="cart.js"></script>
+
+  <!-- App logic -->
   <script src="products.js"></script>
+  <script src="cart.js"></script>
   <script src="app.js"></script>
+
+  <script>
+    // نمایش لینک سفارش‌های من بعد از ورود
+    auth.onAuthStateChanged(user => {
+      const orderLink = document.getElementById("order-history-link");
+      if (user) {
+        orderLink.style.display = "inline-block";
+      } else {
+        orderLink.style.display = "none";
+      }
+    });
+  </script>
 </body>
 </html>
