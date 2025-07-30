@@ -1,6 +1,11 @@
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-// نمایش سبد خرید در cart.html
+// ذخیره سبد خرید در localStorage
+function saveCart() {
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+// رندر سبد خرید
 function renderCartItems() {
   const container = document.getElementById("cart-items");
   if (!container) return;
@@ -10,30 +15,63 @@ function renderCartItems() {
     return;
   }
 
+  let total = 0;
   container.innerHTML = "";
-  cart.forEach(item => {
+  cart.forEach((item, index) => {
+    total += item.price * item.quantity;
     const div = document.createElement("div");
     div.className = "cart-item";
     div.innerHTML = `
       <img src="${item.image}" alt="${item.name}" width="100">
       <p><strong>${item.name}</strong></p>
-      <p>${item.price.toLocaleString()} تومان</p>
+      <p>قیمت واحد: ${item.price.toLocaleString()} تومان</p>
+      <div>
+        <button onclick="decreaseQuantity(${index})">➖</button>
+        <span>${item.quantity}</span>
+        <button onclick="increaseQuantity(${index})">➕</button>
+      </div>
+      <p>جمع: ${(item.price * item.quantity).toLocaleString()} تومان</p>
     `;
     container.appendChild(div);
   });
+
+  const totalDiv = document.createElement("div");
+  totalDiv.innerHTML = `<h3>مبلغ کل: ${total.toLocaleString()} تومان</h3>`;
+  container.appendChild(totalDiv);
 }
 
-// افزودن محصول به سبد خرید
+function increaseQuantity(index) {
+  cart[index].quantity++;
+  saveCart();
+  renderCartItems();
+}
+
+function decreaseQuantity(index) {
+  if (cart[index].quantity > 1) {
+    cart[index].quantity--;
+  } else {
+    cart.splice(index, 1); // حذف محصول
+  }
+  saveCart();
+  renderCartItems();
+}
+
 function addToCart(productId) {
   const product = products.find(p => p.id === productId);
   if (!product) return;
 
-  cart.push(product);
-  localStorage.setItem("cart", JSON.stringify(cart));
+  const existing = cart.find(p => p.id === productId);
+  if (existing) {
+    existing.quantity++;
+  } else {
+    cart.push({ ...product, quantity: 1 });
+  }
+
+  saveCart();
   alert("محصول به سبد خرید افزوده شد.");
 }
 
-// هندل کردن سفارش
+// اجرای رندر و سفارش
 document.addEventListener("DOMContentLoaded", () => {
   renderCartItems();
 
@@ -52,11 +90,20 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      const orderText = cart.map(item => `• ${item.name} - ${item.price.toLocaleString()} تومان`).join("\n");
-      document.getElementById("order-preview-text").textContent =
-        `سفارش‌دهنده: ${name}\nموبایل: ${phone}\nآدرس: ${address}\n\nاقلام سفارش:\n${orderText}`;
+      if (cart.length === 0) {
+        document.getElementById("status").textContent = "سبد خرید شما خالی است.";
+        return;
+      }
 
-      // نمایش مودال تأیید
+      const orderText = cart.map(item =>
+        `• ${item.name} - ${item.quantity} عدد - ${(item.price * item.quantity).toLocaleString()} تومان`
+      ).join("\n");
+
+      const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+      document.getElementById("order-preview-text").textContent =
+        `سفارش‌دهنده: ${name}\nموبایل: ${phone}\nآدرس: ${address}\n\nاقلام سفارش:\n${orderText}\n\n💰 مبلغ کل: ${total.toLocaleString()} تومان`;
+
       document.getElementById("order-preview-modal").style.display = "flex";
 
       document.getElementById("confirm-order-btn").onclick = () => {
@@ -66,10 +113,11 @@ document.addEventListener("DOMContentLoaded", () => {
           phone,
           address,
           items: cart,
+          total,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         }).then(() => {
           cart = [];
-          localStorage.removeItem("cart");
+          saveCart();
           document.getElementById("status").textContent = "سفارش ثبت شد!";
           orderForm.reset();
           renderCartItems();
@@ -86,7 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ارسال اطلاعات پرداخت
+  // فرم پرداخت (همون قبلی)
   const paymentForm = document.getElementById("payment-form");
   if (paymentForm) {
     paymentForm.addEventListener("submit", e => {
