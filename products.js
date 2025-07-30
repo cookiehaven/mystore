@@ -40,9 +40,8 @@ function renderProducts(productArray) {
       const id = parseInt(e.target.getAttribute("data-id"));
       const product = products.find(p => p.id === id);
       if (product && typeof window.addToCart === "function") {
-  window.addToCart(product);
-}
-       else {
+        window.addToCart({ ...product, quantity: 1 });  // 👈 تضمینی با cart.js کار می‌کنه
+      } else {
         console.error("تابع addToCart تعریف نشده یا محصول یافت نشد.");
       }
     });
