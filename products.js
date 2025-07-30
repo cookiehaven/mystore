@@ -9,6 +9,7 @@ const products = [
   { id: 8, name: "چیزکیک نوتلا تک نفره", category: "cake", price: 130000, image: "images/cheeese.cake.nutela.jpg" },
 ];
 
+// نمایش محصولات در صفحه
 function renderProducts(productArray) {
   const container = document.getElementById("product-list");
   if (!container) return;
@@ -27,7 +28,7 @@ function renderProducts(productArray) {
     container.appendChild(card);
   });
 
-  // Attach event listeners to "add to cart" buttons
+  // رویداد کلیک روی دکمه‌ها
   document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
     btn.addEventListener("click", e => {
       const user = firebase.auth().currentUser;
@@ -35,12 +36,20 @@ function renderProducts(productArray) {
         alert("لطفاً ابتدا وارد شوید.");
         return;
       }
+
       const id = parseInt(e.target.getAttribute("data-id"));
-      window.addToCart(id);
+      const product = products.find(p => p.id === id);
+      if (product && typeof window.addToCart === "function") {
+        window.addToCart({ ...product, quantity: 1 });
+        alert(`${product.name} به سبد خرید افزوده شد.`);
+      } else {
+        console.error("تابع addToCart تعریف نشده یا محصول یافت نشد.");
+      }
     });
   });
 }
 
+// فیلتر بر اساس دسته‌بندی
 function filterProducts(category) {
   const filtered = category === "all"
     ? products
@@ -48,6 +57,7 @@ function filterProducts(category) {
   renderProducts(filtered);
 }
 
+// جستجوی محصولات
 function searchProducts() {
   const query = document.getElementById("search-input").value.toLowerCase();
   const filtered = products.filter(p =>
@@ -56,6 +66,7 @@ function searchProducts() {
   renderProducts(filtered);
 }
 
+// اجرای اولیه هنگام لود شدن صفحه
 document.addEventListener("DOMContentLoaded", () => {
   firebase.auth().onAuthStateChanged(() => {
     renderProducts(products);
