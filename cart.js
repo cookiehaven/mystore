@@ -1,11 +1,9 @@
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-// ذخیره سبد خرید در localStorage
 function saveCart() {
   localStorage.setItem("cart", JSON.stringify(cart));
 }
 
-// رندر سبد خرید
 function renderCartItems() {
   const container = document.getElementById("cart-items");
   if (!container) return;
@@ -50,28 +48,24 @@ function decreaseQuantity(index) {
   if (cart[index].quantity > 1) {
     cart[index].quantity--;
   } else {
-    cart.splice(index, 1); // حذف محصول
+    cart.splice(index, 1);
   }
   saveCart();
   renderCartItems();
 }
 
-function addToCart(productId) {
-  const product = products.find(p => p.id === productId);
-  if (!product) return;
-
-  const existing = cart.find(p => p.id === productId);
+function addToCart(product) {
+  const existing = cart.find(p => p.id === product.id);
   if (existing) {
     existing.quantity++;
   } else {
-    cart.push({ ...product, quantity: 1 });
+    cart.push({ ...product });
   }
-
   saveCart();
-  alert("محصول به سبد خرید افزوده شد.");
+  renderCartItems(); // نمایش لحظه‌ای در صورت لزوم
+  alert(`${product.name} به سبد خرید افزوده شد.`);
 }
 
-// اجرای رندر و سفارش
 document.addEventListener("DOMContentLoaded", () => {
   renderCartItems();
 
@@ -134,7 +128,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // فرم پرداخت (همون قبلی)
   const paymentForm = document.getElementById("payment-form");
   if (paymentForm) {
     paymentForm.addEventListener("submit", e => {
