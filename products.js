@@ -31,7 +31,6 @@ function filterProducts(category) {
   const filtered = category === "all"
     ? products
     : products.filter(p => p.category === category);
-
   renderProducts(filtered);
 }
 
@@ -47,5 +46,8 @@ document.addEventListener("DOMContentLoaded", () => {
   renderProducts(products);
 });
 
+// دسترسی سراسری
+window.products = products;
 window.filterProducts = filterProducts;
 window.searchProducts = searchProducts;
+window.renderProducts = renderProducts;
