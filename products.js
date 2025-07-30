@@ -17,15 +17,27 @@ function renderProducts(productArray) {
   productArray.forEach(p => {
     const card = document.createElement("div");
     card.className = "product";
-    const user = firebase.auth().currentUser;
 
     card.innerHTML = `
       <img src="${p.image}" alt="${p.name}" />
       <h2>${p.name}</h2>
       <p>${p.price.toLocaleString()} تومان</p>
-      <button onclick="${user ? `addToCart(${p.id})` : `alert('لطفاً ابتدا وارد شوید.')`}">افزودن به سبد خرید</button>
+      <button class="add-to-cart-btn" data-id="${p.id}">افزودن به سبد خرید</button>
     `;
     container.appendChild(card);
+  });
+
+  // Attach event listeners to "add to cart" buttons
+  document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
+    btn.addEventListener("click", e => {
+      const user = firebase.auth().currentUser;
+      if (!user) {
+        alert("لطفاً ابتدا وارد شوید.");
+        return;
+      }
+      const id = parseInt(e.target.getAttribute("data-id"));
+      window.addToCart(id);
+    });
   });
 }
 
@@ -33,7 +45,6 @@ function filterProducts(category) {
   const filtered = category === "all"
     ? products
     : products.filter(p => p.category === category);
-
   renderProducts(filtered);
 }
 
