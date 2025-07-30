@@ -16,11 +16,11 @@ function addToCart(id) {
     existing.qty++;
   } else {
     const product = products.find(p => p.id === id);
+    if (!product) return alert("محصول یافت نشد");
     cart.push({ ...product, qty: 1 });
   }
   saveCart(cart);
   alert("به سبد خرید اضافه شد!");
-  renderCart();
 }
 
 function updateQty(id, change) {
@@ -39,18 +39,18 @@ function updateQty(id, change) {
 }
 
 function renderCart() {
-  const items = getCart();
   const container = document.getElementById("cart-items");
   if (!container) return;
 
-  if (items.length === 0) {
+  const cart = getCart();
+  if (cart.length === 0) {
     container.innerHTML = "<p>سبد خرید شما خالی است.</p>";
     return;
   }
 
-  const total = items.reduce((sum, item) => sum + item.price * item.qty, 0);
+  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
 
-  container.innerHTML = items.map(item => `
+  container.innerHTML = cart.map(item => `
     <div class="cart-item">
       <img src="${item.image}" alt="${item.name}" />
       <span style="flex:1;">${item.name}</span>
@@ -66,42 +66,54 @@ function renderCart() {
   container.innerHTML += `<hr><div><strong>جمع کل: ${total.toLocaleString()} تومان</strong></div>`;
 }
 
-document.getElementById("order-form").addEventListener("submit", async function (e) {
-  e.preventDefault();
+// فرم سفارش
+document.addEventListener("DOMContentLoaded", () => {
+  renderCart();
 
-  const user = auth.currentUser;
-  if (!user) {
-    document.getElementById("status").textContent = "لطفاً ابتدا وارد شوید.";
-    return;
-  }
+  const form = document.getElementById("order-form");
+  if (form) {
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
 
-  const cart = getCart();
-  if (cart.length === 0) {
-    document.getElementById("status").textContent = "سبد خرید خالی است.";
-    return;
-  }
+      const user = auth.currentUser;
+      const statusText = document.getElementById("status");
 
-  const name = document.getElementById("name").value;
-  const phone = document.getElementById("phone").value;
-  const address = document.getElementById("address").value;
+      if (!user) {
+        statusText.textContent = "لطفاً ابتدا وارد شوید.";
+        return;
+      }
 
-  try {
-    await db.collection("orders").add({
-      uid: user.uid,
-      name,
-      phone,
-      address,
-      cart,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      const cart = getCart();
+      if (cart.length === 0) {
+        statusText.textContent = "سبد خرید خالی است.";
+        return;
+      }
+
+      const name = document.getElementById("name").value;
+      const phone = document.getElementById("phone").value;
+      const address = document.getElementById("address").value;
+
+      try {
+        await db.collection("orders").add({
+          uid: user.uid,
+          name,
+          phone,
+          address,
+          cart,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        statusText.textContent = "سفارش ثبت شد!";
+        localStorage.removeItem("cart");
+        renderCart();
+        form.reset();
+      } catch (err) {
+        statusText.textContent = "خطا در ثبت سفارش: " + err.message;
+      }
     });
-
-    document.getElementById("status").textContent = "سفارش ثبت شد!";
-    localStorage.removeItem("cart");
-    renderCart();
-    this.reset();
-  } catch (err) {
-    document.getElementById("status").textContent = "خطا در ثبت سفارش: " + err.message;
   }
 });
 
-renderCart();
+// دسترسی سراسری
+window.addToCart = addToCart;
+window.updateQty = updateQty;
