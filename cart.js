@@ -1,7 +1,6 @@
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let currentUser = null;
 
-// دریافت کاربر واردشده
 firebase.auth().onAuthStateChanged(user => {
   currentUser = user;
 });
@@ -68,7 +67,6 @@ function addToCart(product) {
     cart.push({ ...product });
   }
   saveCart();
-  renderCartItems();
   alert(`${product.name} به سبد خرید افزوده شد.`);
 }
 
@@ -103,10 +101,8 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("order-preview-text").textContent =
         `سفارش‌دهنده: ${name}\nموبایل: ${phone}\nآدرس: ${address}\n\nاقلام سفارش:\n${orderText}\n\n💰 مبلغ کل: ${total.toLocaleString()} تومان`;
 
-      // نمایش مدال پیش‌نمایش
       document.getElementById("order-preview-modal").style.display = "flex";
 
-      // دکمه تایید سفارش
       document.getElementById("confirm-order-btn").onclick = () => {
         firebase.firestore().collection("orders").add({
           uid: currentUser.uid,
@@ -129,7 +125,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       };
 
-      // دکمه لغو سفارش
       document.getElementById("cancel-order-btn").onclick = () => {
         document.getElementById("order-preview-modal").style.display = "none";
       };
