@@ -9,12 +9,11 @@ const products = [
   { id: 8, name: "چیزکیک نوتلا تک نفره", category: "cake", price: 130000, image: "images/cheeese.cake.nutela.jpg" },
 ];
 
-// نمایش محصولات در صفحه
 function renderProducts(productArray) {
   const container = document.getElementById("product-list");
   if (!container) return;
-
   container.innerHTML = "";
+
   productArray.forEach(p => {
     const card = document.createElement("div");
     card.className = "product";
@@ -28,7 +27,6 @@ function renderProducts(productArray) {
     container.appendChild(card);
   });
 
-  // رویداد کلیک روی دکمه‌ها
   document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
     btn.addEventListener("click", e => {
       const user = firebase.auth().currentUser;
@@ -40,32 +38,25 @@ function renderProducts(productArray) {
       const id = parseInt(e.target.getAttribute("data-id"));
       const product = products.find(p => p.id === id);
       if (product && typeof window.addToCart === "function") {
-        window.addToCart({ ...product, quantity: 1 });  // 👈 تضمینی با cart.js کار می‌کنه
+        window.addToCart({ ...product, quantity: 1 });
       } else {
-        console.error("تابع addToCart تعریف نشده یا محصول یافت نشد.");
+        console.error("addToCart تعریف نشده یا محصول نامعتبر است.");
       }
     });
   });
 }
 
-// فیلتر بر اساس دسته‌بندی
 function filterProducts(category) {
-  const filtered = category === "all"
-    ? products
-    : products.filter(p => p.category === category);
+  const filtered = category === "all" ? products : products.filter(p => p.category === category);
   renderProducts(filtered);
 }
 
-// جستجوی محصولات
 function searchProducts() {
   const query = document.getElementById("search-input").value.toLowerCase();
-  const filtered = products.filter(p =>
-    p.name.toLowerCase().includes(query)
-  );
+  const filtered = products.filter(p => p.name.toLowerCase().includes(query));
   renderProducts(filtered);
 }
 
-// اجرای اولیه هنگام لود شدن صفحه
 document.addEventListener("DOMContentLoaded", () => {
   firebase.auth().onAuthStateChanged(() => {
     renderProducts(products);
