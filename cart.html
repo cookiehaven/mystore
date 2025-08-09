@@ -58,5 +58,13 @@
 
   <script src="cart.js"></script>
   <script src="send-to-telegram.js"></script>
+  <!-- انتهای body یا در head -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>
+  (function(){
+    // جایگزین با Public Key خودت از پنل EmailJS (با پیشوند public_)
+    emailjs.init("public_xxxxxxxx");
+  })();
+</script>
 </body>
 </html>
