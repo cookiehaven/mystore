@@ -91,6 +91,26 @@ async function sendToTelegram(message) {
   }
 }
 
+// ارسال ایمیل fallback با emailjs
+async function sendEmailFallback(message) {
+  try {
+    await emailjs.send("service_vsxwo1q", "template_m9pdjza", { message });
+    statusText.innerText = "⚠️ ارسال به تلگرام انجام نشد، اما سفارش به ایمیل ارسال شد.";
+    paymentStatus.innerText = "";
+    paymentInfoSection.style.display = "none";
+    orderForm.reset();
+    paymentForm.reset();
+    localStorage.removeItem("cart");
+    if (typeof renderCart === "function") renderCart();
+    return true;
+  } catch (error) {
+    console.error("خطا در ارسال ایمیل fallback:", error);
+    statusText.innerText = "❌ خطا در ارسال سفارش به تلگرام و ایمیل. لطفاً دوباره تلاش کنید.";
+    paymentStatus.innerText = "";
+    return false;
+  }
+}
+
 // ارسال سفارش (مرحله اول: تایید فرم سفارش)
 orderForm?.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -172,9 +192,9 @@ paymentForm?.addEventListener("submit", async (e) => {
     paymentForm.reset();
     localStorage.removeItem("cart");
 
-    // اگر تابع renderCart وجود دارد (از cart.js)، آن را اجرا کن
     if (typeof renderCart === "function") renderCart();
   } else {
-    paymentStatus.innerText = "❌ ارسال به تلگرام با خطا مواجه شد. لطفاً دوباره تلاش کنید.";
+    // ارسال fallback ایمیل در صورت شکست ارسال به تلگرام
+    await sendEmailFallback(fullMessage);
   }
 });
