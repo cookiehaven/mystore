@@ -37,34 +37,38 @@
 
   <!-- فرم اطلاعات پرداخت، اول مخفی -->
   <section id="payment-info-section" style="display:none; direction: rtl; text-align: right; margin-top: 20px;">
-  <h3>اطلاعات پرداخت</h3>
-  <p>لطفاً مبلغ واریزی، تاریخ و کد پیگیری تراکنش را وارد کنید.</p>
-  <p style="background:#fffbcc; padding: 10px; border: 1px solid #f0e68c; border-radius: 5px; margin-bottom: 15px;">
-    <strong>شماره کارت:</strong> 6037 1234 5678 9012<br/>
-    <small style="color: #b22222;">برای هربار پرداخت به شماره کارت جدید فقط واریزی انجام بدین لطفا.</small>
-  </p>
-  <form id="payment-form">
-    <input type="text" id="payment-amount" placeholder="مبلغ واریزی (تومان)" required />
-    <input type="text" id="payment-date" placeholder="تاریخ واریز (مثلاً 1402/04/01)" required />
-    <input type="text" id="payment-tracking" placeholder="کد پیگیری تراکنش" required />
-    <button type="submit">ارسال اطلاعات پرداخت</button>
-  </form>
-  <p id="payment-status" style="color: red;"></p>
+    <h3>اطلاعات پرداخت</h3>
+    <p>لطفاً مبلغ واریزی، تاریخ و کد پیگیری تراکنش را وارد کنید.</p>
+    <p style="background:#fffbcc; padding: 10px; border: 1px solid #f0e68c; border-radius: 5px; margin-bottom: 15px;">
+      <strong>شماره کارت:</strong> 6037 1234 5678 9012<br/>
+      <small style="color: #b22222;">برای هربار پرداخت به شماره کارت جدید فقط واریزی انجام بدین لطفا.</small>
+    </p>
+    <form id="payment-form">
+      <input type="text" id="payment-amount" placeholder="مبلغ واریزی (تومان)" required />
+      <input type="text" id="payment-date" placeholder="تاریخ واریز (مثلاً 1402/04/01)" required />
+      <input type="text" id="payment-tracking" placeholder="کد پیگیری تراکنش" required />
+      <button type="submit">ارسال اطلاعات پرداخت</button>
+    </form>
+    <p id="payment-status" style="color: red;"></p>
   </section>
 
   <footer>
     <a href="index.html" class="cart-link">🏠 بازگشت به فروشگاه</a>
   </footer>
 
+  <!-- اول سبد خرید -->
   <script src="cart.js"></script>
+
+  <!-- EmailJS باید قبل از کد ارسال سفارش بیاد -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script>
+    (function(){
+      // جایگزین با Public Key خودت از پنل EmailJS (با پیشوند public_)
+      emailjs.init("public_OhwXhPKs1baeX0UbB");
+    })();
+  </script>
+
+  <!-- بعد کد ارسال سفارش -->
   <script src="send-to-telegram.js"></script>
-  <!-- انتهای body یا در head -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-<script>
-  (function(){
-    // جایگزین با Public Key خودت از پنل EmailJS (با پیشوند public_)
-    emailjs.init("OhwXhPKs1baeX0UbB");
-  })();
-</script>
 </body>
 </html>
