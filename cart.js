@@ -13,6 +13,10 @@ function addToCart(id) {
     existing.qty++;
   } else {
     const product = products.find(p => p.id === id);
+    if (!product) {
+      alert("محصول یافت نشد!");
+      return;
+    }
     cart.push({ ...product, qty: 1 });
   }
   saveCart(cart);
@@ -28,7 +32,6 @@ function updateQty(id, change) {
   cart[itemIndex].qty += change;
 
   if (cart[itemIndex].qty < 1) {
-    // حذف محصول اگر تعداد به صفر رسید
     cart.splice(itemIndex, 1);
   }
 
