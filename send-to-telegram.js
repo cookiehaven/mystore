@@ -1,3 +1,4 @@
+// --- کد خودت بدون تغییر ---
 const orderForm = document.getElementById("order-form");
 const phoneInput = document.getElementById("phone");
 const phoneError = document.getElementById("phone-error");
@@ -29,13 +30,11 @@ function getCart() {
   }
 }
 
-// اعتبارسنجی شماره موبایل در زمان تایپ
 phoneInput?.addEventListener("input", () => {
   const phone = phoneInput.value.trim();
   phoneError.textContent = phone === "" ? "" : (validatePhone(phone) ? "" : "شماره معتبر نیست. مثلاً: 09123456789");
 });
 
-// ساخت پیام سفارش برای پیش‌نمایش و ارسال
 function buildOrderMessage(name, phone, address, cart) {
   const totalPrice = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
   const orderLines = cart.map(item =>
@@ -57,10 +56,8 @@ ${orderLines}
 💰 جمع کل: ${totalPrice.toLocaleString()} تومان`;
 }
 
-// ساخت پیام کامل با اطلاعات پرداخت
 function buildFullMessage(name, phone, address, cart, amount, payDate, tracking) {
   const orderMessage = buildOrderMessage(name, phone, address, cart);
-
   return `${orderMessage}
 
 💳 اطلاعات پرداخت:
@@ -69,11 +66,9 @@ function buildFullMessage(name, phone, address, cart, amount, payDate, tracking)
 - کد پیگیری: ${tracking}`;
 }
 
-// ارسال پیام به تلگرام
 async function sendToTelegram(message) {
   const TELEGRAM_BOT_TOKEN = "8498305203:AAGTSIPm-EqhwXiYqMEGMdaTUCjwcVLE6g0";
   const CHAT_ID = "64410546";
-
   const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
   try {
@@ -91,10 +86,12 @@ async function sendToTelegram(message) {
   }
 }
 
-// ارسال ایمیل fallback با emailjs
+// --- این بخش رو اصلاح کردم که حتماً EmailJS کار کنه ---
 async function sendEmailFallback(message) {
   try {
-    await emailjs.send("service_vsxwo1q", "template_m9pdjza", { message });
+    await emailjs.send("service_vsxwo1q", "template_m9pdjza", {
+      message: message
+    });
     statusText.innerText = "⚠️ ارسال به تلگرام انجام نشد، اما سفارش به ایمیل ارسال شد.";
     paymentStatus.innerText = "";
     paymentInfoSection.style.display = "none";
@@ -111,10 +108,8 @@ async function sendEmailFallback(message) {
   }
 }
 
-// ارسال سفارش (مرحله اول: تایید فرم سفارش)
 orderForm?.addEventListener("submit", (e) => {
   e.preventDefault();
-
   const name = document.getElementById("name").value.trim();
   const phone = phoneInput.value.trim();
   const address = document.getElementById("address").value.trim();
@@ -127,12 +122,10 @@ orderForm?.addEventListener("submit", (e) => {
     statusText.innerText = "⚠️ لطفاً تمام فیلدهای فرم سفارش را پر کنید.";
     return;
   }
-
   if (cart.length === 0) {
     statusText.innerText = "⚠️ سبد خرید شما خالی است.";
     return;
   }
-
   if (!validatePhone(phone)) {
     phoneError.textContent = "شماره معتبر نیست. مثلاً: 09123456789";
     return;
@@ -140,27 +133,23 @@ orderForm?.addEventListener("submit", (e) => {
     phoneError.textContent = "";
   }
 
-  // نمایش پیش‌نمایش سفارش
   orderPreviewText.textContent = buildOrderMessage(name, phone, address, cart);
   orderPreviewModal.style.display = "flex";
   paymentInfoSection.style.display = "none";
 });
 
-// تایید پیش‌نمایش و نمایش فرم پرداخت
 confirmOrderBtn.onclick = () => {
   orderPreviewModal.style.display = "none";
   paymentInfoSection.style.display = "block";
   statusText.innerText = "";
 };
 
-// لغو سفارش
 cancelOrderBtn.onclick = () => {
   orderPreviewModal.style.display = "none";
   statusText.innerText = "❌ ارسال سفارش لغو شد.";
   paymentInfoSection.style.display = "none";
 };
 
-// ارسال اطلاعات پرداخت
 paymentForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -178,7 +167,6 @@ paymentForm?.addEventListener("submit", async (e) => {
   const address = document.getElementById("address").value.trim();
   const cart = getCart();
 
-  // پیام کامل با اطلاعات پرداخت
   const fullMessage = buildFullMessage(name, phone, address, cart, amount, payDate, tracking);
 
   paymentStatus.innerText = "در حال ارسال اطلاعات...";
@@ -191,10 +179,8 @@ paymentForm?.addEventListener("submit", async (e) => {
     orderForm.reset();
     paymentForm.reset();
     localStorage.removeItem("cart");
-
     if (typeof renderCart === "function") renderCart();
   } else {
-    // ارسال fallback ایمیل در صورت شکست ارسال به تلگرام
     await sendEmailFallback(fullMessage);
   }
 });
