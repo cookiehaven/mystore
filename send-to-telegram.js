@@ -135,13 +135,11 @@ ${orderLines}
   console.log("پیام ارسالی به تلگرام:", fullMessage);
 
   // ارسال به تلگرام
-  fetch("https://api.telegram.org/bot8498305203:AAGTSIPm-EqhwXiYqMEGMdaTUCjwcVLE6g0/sendMessage", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      chat_id: "64410546",
-      text: fullMessage
-    })
+  fetch("https://cookiehaven.42web.io/send.php", { // آدرس هاست خودت
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ message: fullMessage })
+})
   })
   .then(res => res.json())
   .then(data => {
