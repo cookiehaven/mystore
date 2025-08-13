@@ -140,7 +140,6 @@ ${orderLines}
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ message: fullMessage })
 })
-  })
   .then(res => res.json())
   .then(data => {
     if (data.ok) {
